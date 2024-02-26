@@ -12,8 +12,8 @@ export class OrderRepository {
   };
 
   createOrder = async (carts, userId, address) => {
-    // 주문 생성후 카트 status, orderId 수정 & Stores의 orderCount += 1
     const order = await this.prisma.$transaction(async (tx) => {
+      // 주문 생성
       const order = await tx.orders.create({
         data: {
           storeId: +carts[0].storeId,
@@ -22,13 +22,15 @@ export class OrderRepository {
           address,
         },
       });
+      //카트 status, orderId 수정
       await tx.carts.update({
         where: { userId: +userId },
         data: {
           orderId: +order.id,
-          status: "UNAVAILABLE",
+          status: 'UNAVAILABLE',
         },
       });
+      // Stores의 orderCount += 1
       await tx.stores.update({
         where: { id: +carts[0].storeId },
         data: {
@@ -37,9 +39,27 @@ export class OrderRepository {
           },
         },
       });
+      // 사용자 포인트 차감
+      await tx.users.update({
+        where: { id: +userId },
+        data: {
+          point: {
+            decrement: [carts.totalPrice],
+          },
+        },
+      });
+
       return order;
     });
     return order;
+  };
+
+  getPointById = async (userId) => {
+    const point = await this.prisma.users.findUnique({
+      where: { id: +userId },
+      select: { point: true },
+    });
+    return point;
   };
 
   getStoreIdByOwnerId = async (ownerId) => {
@@ -67,8 +87,8 @@ export class OrderRepository {
         status: true,
       },
       orderBy: {
-        status: "desc",
-        createdAt: "desc",
+        status: 'desc',
+        createdAt: 'desc',
       },
     });
     // 메뉴 이름, 메뉴 이미지, 메뉴 가격, 주문 수량 (Carts 중 status가 unavailable인 것들)
@@ -78,7 +98,7 @@ export class OrderRepository {
       const carts = await this.prisma.carts.findMany({
         where: {
           orderId: +order.id,
-          status: "UNAVAILABLE",
+          status: 'UNAVAILABLE',
         },
         select: {
           menuId: true,
