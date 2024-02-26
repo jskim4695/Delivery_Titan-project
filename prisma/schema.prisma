@@ -6,3 +6,124 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
+
+model Cart {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  storeId   Int
+  menuId    Int
+  quantity  Int      @default(1)
+  orderId   Int?
+  status    Status
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  User  User   @relation(fields: [userId], references: [id])
+  Store Store  @relation(fields: [storeId], references: [id])
+  Menu  Menu   @relation(fields: [menuId], references: [id])
+  Order Order? @relation(fields: [orderId], references: [id])
+}
+
+model Store {
+  id         Int      @id @default(autoincrement())
+  ownerId    Int
+  storeName  String
+  category   Category
+  storeImage String
+  storeIntro String
+  storeRate  Float
+  orderCount Int      @default(0)
+  status     Status
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  User    User     @relation(fields: [ownerId], references: [id])
+  Carts   Cart[]
+  Menus   Menu[]
+  Orders  Order[]
+  Reviews Review[]
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  nickname     String   @unique
+  email        String?  @unique
+  password     String
+  phone        String
+  address      String?
+  profileImage String?
+  role         Role
+  clientId     String?
+  name         String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  Stores  Store[]
+  Carts   Cart[]
+  Orders  Order[]
+  Reviews Review[]
+}
+
+model Menu {
+  id        Int    @id @default(autoincrement())
+  storeId   Int
+  menuName  String
+  menuInfo  String
+  price     Int
+  menuImage String
+
+  Store Store  @relation(fields: [storeId], references: [id])
+  Carts Cart[]
+}
+
+model Order {
+  id         Int      @id @default(autoincrement())
+  storeId    Int
+  userId     Int
+  totalPrice Int
+  status     String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  Store   Store    @relation(fields: [storeId], references: [id])
+  User    User     @relation(fields: [userId], references: [id])
+  Carts   Cart[]
+  Reviews Review[]
+}
+
+model Review {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  storeId     Int
+  orderId     Int
+  contents    String
+  stars       Int
+  reviewImage String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  User  User  @relation(fields: [userId], references: [id])
+  Store Store @relation(fields: [storeId], references: [id])
+  Order Order @relation(fields: [orderId], references: [id])
+}
+
+enum Role {
+  CUSTOMER
+  OWNER
+}
+
+enum Status {
+  AVAILABLE
+  UNAVAILABLE
+}
+
+enum Category {
+  CHICKEN
+  ASIAN
+  WESTERN
+  KOREAN
+  CHINESE
+  JAPANESE
+  PIZZA
+  DESSERT
+}
