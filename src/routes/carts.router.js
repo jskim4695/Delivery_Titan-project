@@ -27,4 +27,11 @@ router.update(
 /** 내 카트 조회 */
 router.get("/user/cart", authenticateUser, cartController.getCart);
 
+/** 카트에서 삭제 */
+router.delete(
+  "/user/cart/:menuId",
+  authenticateUser,
+  cartController.deleteMenu
+);
+
 export default router;

@@ -20,7 +20,6 @@ export class CartRepository {
           menuId: +menuId,
           storeId: +storeId,
           userId: +userId,
-          status: "AVAILABLE",
         },
       });
       return cart;
@@ -48,5 +47,20 @@ export class CartRepository {
       where: { id: +menuId },
     });
     return menu;
+  };
+
+  getStoreNameById = async (storeId) => {
+    const storeName = await this.prisma.stores.findUnique({
+      where: { id: +storeId },
+      select: { storeName: true },
+    });
+    return storeName;
+  };
+
+  deleteMenuFromCart = async (menuId, userId) => {
+    await this.prisma.carts.delete({
+      where: { userId: +userId, menuId: +menuId },
+    });
+    return;
   };
 }

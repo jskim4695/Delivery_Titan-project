@@ -53,16 +53,15 @@ export class CartController {
       next(err);
     }
   };
-  /** 카트에 담기 */
-  createCart = async (req, res, next) => {
+
+  /** 카트에서 삭제 */
+  deleteMenu = async (req, res, next) => {
     try {
-    } catch (err) {
-      next(err);
-    }
-  };
-  /** 카트에 담기 */
-  createCart = async (req, res, next) => {
-    try {
+      const { menuId } = req.params;
+      const userId = req.userId;
+      await this.cartService.deleteMenu(menuId, userId);
+      const cart = await this.cartService.getCart(userId);
+      return res.status(200).json({ cart });
     } catch (err) {
       next(err);
     }

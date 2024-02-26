@@ -22,18 +22,30 @@ export class CartService {
     return cart;
   };
 
+  // 식당 이름, 메뉴 이름, 메뉴 이미지, 메뉴 가격, 메뉴 수량, 총 가격
   getCart = async (userId) => {
     const carts = await this.cartRepository.getCartsByUserId(userId);
+    if (carts.length === 0) return carts;
+
+    const storeName = await this.cartRepository.getStoreNameById(
+      carts[0].storeId
+    );
+    carts.storeName = storeName;
+
     let totalPrice = 0;
     carts.forEach(async (cart) => {
       const menu = await this.cartRepository.getMenuById(cart.menuId);
       cart.menuName = menu.menuName;
-      cart.menuInfo = menu.menuInfo;
       cart.menuImage = menu.menuImage;
       cart.price = menu.price;
       totalPrice += cart.price * cart.quantity;
     });
     carts.totalPrice = totalPrice;
     return carts;
+  };
+
+  deleteMenu = async (menuId, userId) => {
+    await this.cartRepository.deleteMenuFromCart(menuId, userId);
+    return;
   };
 }

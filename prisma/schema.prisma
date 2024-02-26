@@ -41,6 +41,7 @@ model Stores {
   storePhone   String    @map("storePhone")
   createdAt    DateTime  @default(now()) @map("createdAt")
   updatedAt    DateTime  @updatedAt @map("updatedAt")
+  shippingFee  Int       @default(0) @map("shippingFee")
   Carts        Carts[]
   menu         Menu[]
   orders       Orders[]
@@ -64,16 +65,18 @@ model Menu {
 }
 
 model Orders {
-  id         Int       @id @default(autoincrement()) @map("id")
-  storeId    Int       @map("storeId")
-  userId     Int       @map("userId")
-  totalPrice Int       @map("totalPrice")
-  status     String    @map("status")
-  createdAt  DateTime  @default(now()) @map("createdAt")
-  updatedAt  DateTime  @updatedAt @map("updatedAt")
+  id         Int          @id @default(autoincrement()) @map("id")
+  storeId    Int          @map("storeId")
+  userId     Int          @map("userId")
+  totalPrice Int          @map("totalPrice")
+  status     Order_status @default(ORDER_COMPLETE) @map("status")
+  createdAt  DateTime     @default(now()) @map("createdAt")
+  updatedAt  DateTime     @updatedAt @map("updatedAt")
+  orderCount Int          @default(0) @map("orderCount")
+  address    String       @map("address")
   Carts      Carts[]
-  Store      Stores    @relation(fields: [storeId], references: [id], onDelete: Cascade)
-  Users      Users     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Store      Stores       @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  Users      Users        @relation(fields: [userId], references: [id], onDelete: Cascade)
   reviews    Reviews[]
 
   @@index([storeId], map: "Orders_storeId_fkey")
@@ -102,19 +105,18 @@ model Reviews {
 }
 
 model Carts {
-  id        Int          @id @default(autoincrement())
-  userId    Int          @unique
+  id        Int      @id @default(autoincrement())
+  userId    Int      @unique
   storeId   Int
   menuId    Int
-  quantity  Int          @default(1)
+  quantity  Int      @default(1)
   orderId   Int?
-  status    Carts_status
-  createdAt DateTime     @default(now())
+  createdAt DateTime @default(now())
   updatedAt DateTime
-  Menu      Menu         @relation(fields: [menuId], references: [id], onDelete: Cascade)
-  Orders    Orders?      @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  Stores    Stores       @relation(fields: [storeId], references: [id], onDelete: Cascade)
-  Users     Users        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Menu      Menu     @relation(fields: [menuId], references: [id], onDelete: Cascade)
+  Orders    Orders?  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  Stores    Stores   @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  Users     Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([menuId], map: "Carts_menuId_fkey")
   @@index([orderId], map: "Carts_orderId_fkey")
@@ -142,7 +144,9 @@ enum Category {
   DESSERT
 }
 
-enum Carts_status {
-  AVAILABLE
-  UNAVAILABLE
+enum Order_status {
+  ORDER_COMPLETE
+  PREPARING
+  DELIVERING
+  DELIVERY_COMPLETE
 }
