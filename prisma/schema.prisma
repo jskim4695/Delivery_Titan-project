@@ -72,7 +72,6 @@ model Orders {
   status     Order_status @default(ORDER_COMPLETE) @map("status")
   createdAt  DateTime     @default(now()) @map("createdAt")
   updatedAt  DateTime     @updatedAt @map("updatedAt")
-  orderCount Int          @default(0) @map("orderCount")
   address    String       @map("address")
   Carts      Carts[]
   Store      Stores       @relation(fields: [storeId], references: [id], onDelete: Cascade)
@@ -112,7 +111,8 @@ model Carts {
   quantity  Int      @default(1)
   orderId   Int?
   createdAt DateTime @default(now())
-  updatedAt DateTime
+  updatedAt DateTime @updatedAt
+  status    Status   @default(AVAILABLE)
   Menu      Menu     @relation(fields: [menuId], references: [id], onDelete: Cascade)
   Orders    Orders?  @relation(fields: [orderId], references: [id], onDelete: Cascade)
   Stores    Stores   @relation(fields: [storeId], references: [id], onDelete: Cascade)
