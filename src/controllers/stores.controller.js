@@ -18,13 +18,13 @@ export class StoresController {
 	/* 업장 저장 */
 	createStore = async (req, res, next) => {
 		try {
-			const requiredFields = ['ownerId', 'storeName', 'category', 'storeImage', 'storeIntro'];
+			const requiredFields = ['ownerId', 'storeName', 'category', 'storeImage', 'storeIntro', 'status', 'storeAddress', 'storePhone', 'shippingFee'];
             const missingFields = requiredFields.filter(field => !req.body[field]);
 
             if (missingFields.length > 0) {
                 throw new ApiError(404, `필수 필드가 누락되었습니다: ${missingFields.join(', ')}`);
             }
-            const { ownerId, storeName, category, storeImage, storeIntro } = req.body;
+            const { ownerId, storeName, category, storeImage, storeIntro, status, storeAddress, storePhone, shippingFee } = req.body;
 
 			const createdStore = await this.storesService.createStore(
 				ownerId,
@@ -32,6 +32,10 @@ export class StoresController {
 				category,
 				storeImage,
 				storeIntro,
+				status,
+				storeAddress,
+				storePhone,
+				shippingFee,
 			);
 			return res.status(201).json({ data: createdStore });
 		} catch (err) {
@@ -67,7 +71,7 @@ export class StoresController {
 		try {
 			const { storeId } = req.params;
 			//const loginId = req.user.userId;
-			const { storeName, category, storeImage, storeIntro } = req.body;
+			const { storeName, category, storeImage, storeIntro, status, storeAddress, storePhone, shippingFee } = req.body;
 
 			const updatedStore = await this.storesService.updateStore(
                 //loginId,
@@ -76,6 +80,10 @@ export class StoresController {
                 category,
                 storeImage,
                 storeIntro,
+				status,
+				storeAddress,
+				storePhone,
+				shippingFee,
 			);
 
 			return res.status(200).json({ data: updatedStore });
@@ -84,7 +92,7 @@ export class StoresController {
 		}
 	};
 
-	/* 이력서 삭제 */
+	/* 업장 삭제 */
 	deleteStore = async (req, res, next) => {
 		try {
 			const { storeId } = req.params;
