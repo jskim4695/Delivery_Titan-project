@@ -23,11 +23,16 @@ export class StoresService {
 		return stores.map((store) => {
 			return {
 				ownerId: store.ownerId,
+				ownerNickname: store.user.nickname,
 				storeName: store.storeName,
 				category: store.category,
 				contents: store.contents,
 				storeImage: store.storeImage,
 				storeIntro: store.storeIntro,
+				status : store.status,
+				storeAddress: store.storeAddress,
+				storePhone: store.storePhone,
+				shippingFee: store.shippingFee,
 				createdAt: store.createdAt,
 				updatedAt: store.updatedAt,
 			};
@@ -43,13 +48,17 @@ export class StoresService {
      * @param {*} storeIntro 
      * @returns 
      */
-	createStore = async (ownerId, storeName, category, storeImage, storeIntro) => {
+	createStore = async (ownerId, storeName, category, storeImage, storeIntro, status, storeAddress, storePhone, shippingFee) => {
 		const createdStore = await this.storesRepository.createStore(
             ownerId,
             storeName,
             category,
             storeImage,
             storeIntro,
+			status,
+			storeAddress,
+			storePhone,
+			shippingFee,
 		);
 
 		return {
@@ -58,6 +67,10 @@ export class StoresService {
 			category: createdStore.category,
 			storeImage: createdStore.storeImage,
 			storeIntro: createdStore.storeIntro,
+			status: createdStore.status,
+			storeAddress: createdStore.storeAddress,
+			storePhone: createdStore.storePhone,
+			shippingFee: createdStore.shippingFee,
 			createdAt: createdStore.createdAt,
 			updatedAt: createdStore.updatedAt,
 		};
@@ -77,11 +90,16 @@ export class StoresService {
 
 		return {
             ownerId: store.ownerId,
+			ownerNickname: store.user.nickname,
             storeName: store.storeName,
             category: store.category,
             contents: store.contents,
             storeImage: store.storeImage,
             storeIntro: store.storeIntro,
+			status : store.status,
+			storeAddress: store.storeAddress,
+			storePhone: store.storePhone,
+			shippingFee: store.shippingFee,
             createdAt: store.createdAt,
             updatedAt: store.updatedAt,
 		};
@@ -93,6 +111,10 @@ export class StoresService {
         category,
         storeImage,
         storeIntro,
+		status,
+		storeAddress,
+		storePhone,
+		shippingFee,
 	) => {
 		const store = await this.storesRepository.findStoreById(storeId);
 
@@ -110,6 +132,10 @@ export class StoresService {
             category,
             storeImage,
             storeIntro,
+			status,
+			storeAddress,
+			storePhone,
+			shippingFee,
 		);
 
 		return {
