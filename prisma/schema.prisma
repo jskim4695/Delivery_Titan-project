@@ -23,6 +23,7 @@ model Users {
   Carts        Carts?
   orders       Orders[]
   reviews      Reviews[]
+  stores       Stores[]  
 
   @@map("Users")
 }
@@ -46,6 +47,7 @@ model Stores {
   menu         Menu[]
   orders       Orders[]
   reviews      Reviews[]
+  user         Users     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
 
   @@map("Stores")
 }
