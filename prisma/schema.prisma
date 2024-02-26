@@ -6,3 +6,147 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
+
+model Users {
+  id           Int       @id @default(autoincrement()) @map("id")
+  nickname     String    @unique @map("nickname")
+  email        String?   @unique @map("email")
+  password     String    @map("password")
+  phone        String    @map("phone")
+  address      String?   @map("address")
+  profileImage String?   @map("profileImage")
+  role         Role      @map("role")
+  clientId     String?   @map("clientId")
+  name         String?   @map("name")
+  createdAt    DateTime  @default(now()) @map("createdAt")
+  updatedAt    DateTime  @updatedAt @map("updatedAt")
+  Carts        Carts?
+  orders       Orders[]
+  reviews      Reviews[]
+
+  @@map("Users")
+}
+
+model Stores {
+  id           Int       @id @default(autoincrement()) @map("id")
+  ownerId      Int       @unique @map("ownerId")
+  storeName    String    @map("storeName")
+  category     Category  @map("category")
+  storeImage   String    @map("storeImage")
+  storeIntro   String    @map("storeIntro")
+  storeRate    Float     @map("storeRate")
+  orderCount   Int       @default(0) @map("orderCount")
+  status       Status    @map("status")
+  storeAddress String    @map("storeAddress")
+  storePhone   String    @map("storePhone")
+  createdAt    DateTime  @default(now()) @map("createdAt")
+  updatedAt    DateTime  @updatedAt @map("updatedAt")
+  shippingFee  Int       @default(0) @map("shippingFee")
+  Carts        Carts[]
+  menu         Menu[]
+  orders       Orders[]
+  reviews      Reviews[]
+
+  @@map("Stores")
+}
+
+model Menu {
+  id        Int     @id @default(autoincrement()) @map("id")
+  storeId   Int     @map("storeId")
+  menuName  String  @map("menuName")
+  menuInfo  String  @map("menuInfo")
+  price     Int     @map("price")
+  menuImage String  @map("menuImage")
+  Carts     Carts[]
+  store     Stores  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@index([storeId], map: "Menu_storeId_fkey")
+  @@map("Menu")
+}
+
+model Orders {
+  id         Int          @id @default(autoincrement()) @map("id")
+  storeId    Int          @map("storeId")
+  userId     Int          @map("userId")
+  totalPrice Int          @map("totalPrice")
+  status     Order_status @default(ORDER_COMPLETE) @map("status")
+  createdAt  DateTime     @default(now()) @map("createdAt")
+  updatedAt  DateTime     @updatedAt @map("updatedAt")
+  address    String       @map("address")
+  Carts      Carts[]
+  Store      Stores       @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  Users      Users        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reviews    Reviews[]
+
+  @@index([storeId], map: "Orders_storeId_fkey")
+  @@index([userId], map: "Orders_userId_fkey")
+  @@map("Orders")
+}
+
+model Reviews {
+  id          Int      @id @default(autoincrement()) @map("id")
+  userId      Int      @map("userId")
+  storeId     Int      @map("storeId")
+  orderId     Int      @map("orderId")
+  contents    String   @map("contents")
+  stars       Int      @map("stars")
+  reviewImage String   @map("reviewImage")
+  createdAt   DateTime @default(now()) @map("createdAt")
+  updatedAt   DateTime @updatedAt @map("updatedAt")
+  order       Orders   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  store       Stores   @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  users       Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([orderId], map: "Reviews_orderId_fkey")
+  @@index([storeId], map: "Reviews_storeId_fkey")
+  @@index([userId], map: "Reviews_userId_fkey")
+  @@map("Reviews")
+}
+
+model Carts {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @unique
+  storeId   Int
+  menuId    Int
+  quantity  Int      @default(1)
+  orderId   Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  status    Status   @default(AVAILABLE)
+  Menu      Menu     @relation(fields: [menuId], references: [id], onDelete: Cascade)
+  Orders    Orders?  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  Stores    Stores   @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  Users     Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([menuId], map: "Carts_menuId_fkey")
+  @@index([orderId], map: "Carts_orderId_fkey")
+  @@index([storeId], map: "Carts_storeId_fkey")
+}
+
+enum Role {
+  CUSTOMER
+  OWNER
+}
+
+enum Status {
+  AVAILABLE
+  UNAVAILABLE
+}
+
+enum Category {
+  CHICKEN
+  ASIAN
+  WESTERN
+  KOREAN
+  CHINESE
+  JAPANESE
+  PIZZA
+  DESSERT
+}
+
+enum Order_status {
+  ORDER_COMPLETE
+  PREPARING
+  DELIVERING
+  DELIVERY_COMPLETE
+}
