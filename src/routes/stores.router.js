@@ -19,30 +19,21 @@ router.post('/store', storesController.createStore);
 /**
  * 업장 전체 조회
  */
-router.get('/store',  storesController.getStores);
+router.get('/store', storesController.getStores);
 
 /**
  * 업장 하나 조회
  */
-router.get(
-	'/store/:storeId',
-	storesController.getStoreById,
-);
+router.get('/store/:storeId', storesController.getStoreById);
 /**
  * 업장 수정
  */
-router.patch(
-	'/store/:storeId',
-	storesController.updateStore,
-);
+router.patch('/store/:storeId', storesController.updateStore);
 
 /**
  * 업장 삭제
  */
-router.delete(
-	'/store/:storeId',
-	storesController.deleteStore,
-);
+router.delete('/store/:storeId', storesController.deleteStore);
 
 router.use(errorHandler);
 
