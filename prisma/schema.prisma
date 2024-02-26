@@ -34,7 +34,7 @@ model Stores {
   category     Category  @map("category")
   storeImage   String    @map("storeImage")
   storeIntro   String    @map("storeIntro")
-  storeRate    Float     @map("storeRate")
+  storeRate    Float     @default(0) @map("storeRate")
   orderCount   Int       @default(0) @map("orderCount")
   status       Status    @map("status")
   storeAddress String    @map("storeAddress")
