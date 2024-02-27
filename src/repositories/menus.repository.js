@@ -65,7 +65,7 @@ export class MenuRepository {
     return menu;
   }; //findMenuById
 
-  updateMenu = async (menuId, menuName, menuInfo, price, menuImage) => {
+  updateMenu = async (menuId, menuName, menuInfo, menuImage, price) => {
     const updatedMenu = await this.prisma.menu.update({
       where: {
         id: +menuId,
