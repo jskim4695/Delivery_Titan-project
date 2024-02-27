@@ -16,7 +16,7 @@ router.post(
   authenticateUser,
   cartController.addToCart
 );
-// TODO 주석 해제하기
+
 /** 카트의 메뉴 수량 변경 */
 router.patch(
   '/main/store/:storeId/:menuId/cart',

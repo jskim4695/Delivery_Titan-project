@@ -84,64 +84,80 @@ export class UserController {
         email,
         password,
       });
+
+      res.cookie('accessToken', token.accessToken, {
+        maxAge: 12 * 60 * 60 * 1000,
+        httpOnly: true,
+      });
+      res.cookie('refreshToken', token.refreshToken, {
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        httpOnly: true,
+      });
+
       return res.json(token);
     } catch (err) {
       return res.status(err.code).json({ message: err.message });
     }
   };
 
-  getUser = (req, res) => {
-    const user = req.userId;
-
-    return res.json({
-      email: user.email,
-      name: user.name,
-    });
-  };
-
-  editInfo = async (req, res, next) => {
+  getUser = async (req, res) => {
     try {
-      const user = req.userId;
-      const userId = req.params;
-      const {
-        email,
-        clientId,
-        password,
-        name,
-        nickname,
-        phone,
-        address,
-        role,
-        profileImg,
-      } = data;
+      const { userId } = req.params;
+      const user = await this.userService.getUserById(userId);
 
-      if (user !== userId) {
-        return res.status(403).json({
+      if (!user) {
+        return res.status(404).json({
           success: false,
-          message: '접근 권한이 없습니다.',
+          message: '사용자를 찾을 수 없습니다.',
         });
       }
 
-      await this.userService.updateUser({
-        userId,
-        data: {
-          email,
-          clientId,
-          password,
-          name,
-          nickname,
-          phone,
-          address,
-          role,
-          profileImg,
-        },
-      });
+      return res.json(user);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  editInfo = async (req, res) => {
+    try {
+      const userId = req.params.userId;
+      const { password, name, nickname, phone, address, role, profileImg } =
+        req.body;
+
+      //TODO 나중에 살리기 + 라우터에 미들웨어 추가
+      // if (req.userId !== userId) {
+      //   return res.status(403).json({
+      //     success: false,
+      //     message: '접근 권한이 없습니다.',
+      //   });
+      // }
+      const data = {};
+
+      if (
+        password ||
+        name ||
+        nickname ||
+        phone ||
+        address ||
+        role ||
+        profileImg
+      ) {
+        data.password = password;
+        data.name = name;
+        data.nickname = nickname;
+        data.phone = phone;
+        data.address = address;
+        data.role = role;
+        data.profileImg = profileImg;
+      }
+
+      await this.userService.updateUser(userId, data);
 
       return res
         .status(200)
         .json({ success: true, message: '정보수정에 성공하였습니다.' });
     } catch (err) {
-      next(err);
+      return res.status(500).json({ message: err.message });
     }
   };
 }

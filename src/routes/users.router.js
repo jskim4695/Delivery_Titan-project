@@ -13,7 +13,7 @@ const userController = new UserController(userService);
 
 router.post('/sign-up', userController.userSignUp);
 router.post('/sign-in', userController.userSignIn);
-router.get('/users', authenticateUser, userController.getUser);
-router.put('/users/:userId', authenticateUser, userController.editInfo);
+router.get('/users/:userId', userController.getUser);
+router.patch('/users/:userId', userController.editInfo);
 
 export default router;

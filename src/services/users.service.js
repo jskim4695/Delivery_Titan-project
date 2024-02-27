@@ -89,10 +89,7 @@ export class UserService {
           };
         }
 
-        user = await this.userRepository.selectOneUserByEmailAndPassword(
-          email,
-          password
-        );
+        user = await this.userRepository.selectOneUserByEmail(email);
 
         if (!user || !(await bcrypt.compare(password, user.password))) {
           throw {
@@ -105,36 +102,75 @@ export class UserService {
       // 로그인 성공
       const accessToken = jwt.sign(
         { userId: user.userId },
-        'process.env.ACCESS_SECRET_KEY',
+        process.env.ACCESS_SECRET_KEY,
         {
           expiresIn: '12h',
         }
       );
       const refreshToken = jwt.sign(
         { userId: user.userId },
-        'process.env.REFRESH_SECRET_KEY',
+        process.env.REFRESH_SECRET_KEY,
         { expiresIn: '7d' }
       );
-      return res.json({
+
+      return {
         accessToken,
         refreshToken,
-      });
+      };
     } catch (err) {
       throw err;
     }
   };
 
-  updateUser = async (userId, updatedData) => {
+  getUserById = async (userId) => {
     try {
-      const user = await this.userRepository.findOneUserByUserId(
-        userId,
-        updatedData
-      );
+      const user = await this.userRepository.findOneUserByUserId(userId);
 
-      const updatedUser = await updateUserByUserId(userId, updatedData);
+      if (!user) {
+        throw {
+          code: 401,
+          message: '올바르지 않은 로그인 정보입니다.',
+        };
+      }
+
+      if (user.role === 'CUSTOMER') {
+        return {
+          nickname: user.nickname,
+          email: user.email,
+          createdAt: user.createdAt,
+        };
+      } else if (user.role === 'OWNER') {
+        const store = await this.userRepository.getStoreByOwnerId(userId);
+        return {
+          nickname: user.nickname,
+          email: user.email,
+          storeName: store.storeName,
+          createdAt: store.createdAt,
+        };
+      }
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  updateUser = async (userId, data) => {
+    try {
+      const user = await this.userRepository.findOneUserByUserId(userId);
+
+      if (!user) {
+        throw {
+          code: 401,
+          message: '사용자를 찾을 수 없습니다.',
+        };
+      }
+
+      const updatedUser = await this.userRepository.updateUserByUserId(
+        userId,
+        data
+      );
       return updatedUser;
     } catch (err) {
-      console.log(err);
+      throw err;
     }
   };
 }
