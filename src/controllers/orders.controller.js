@@ -15,18 +15,26 @@ export class OrderController {
     }
   };
 
-  /** 주문 확인하기(사장) */
+  /** 주문 확인하기 */
   getOrders = async (req, res, next) => {
     try {
-      const ownerId = req.userId;
-      const orders = await this.orderService.getOrders(ownerId);
+      let orders = null;
+      if (req.role == 'CUSTOMER') {
+        //고객이 내 주문 목록 확인하기
+        const userId = req.userId;
+        orders = await this.orderService.getOrdersByUserId(userId);
+      } else if (req.role == 'OWNER') {
+        //사장이 주문 확인하기
+        const ownerId = req.userId;
+        orders = await this.orderService.getOrdersByOwnerId(ownerId);
+      }
       return res.status(200).json({ orders });
     } catch (err) {
       next(err);
     }
   };
 
-  /** 배달 완료로 주문 상태 변경하기 (사장) */
+  /** 주문 상태 변경하기 (사장) */
   updateStatus = async (req, res, next) => {
     try {
       const { orderId } = req.params;

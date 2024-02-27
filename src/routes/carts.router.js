@@ -18,7 +18,7 @@ router.post(
 );
 
 /** 카트의 메뉴 수량 변경 */
-router.update(
+router.patch(
   '/main/store/:storeId/:menuId/cart',
   authenticateUser,
   cartController.updateQuantity

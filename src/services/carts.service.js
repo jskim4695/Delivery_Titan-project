@@ -4,21 +4,49 @@ export class CartService {
   }
 
   addToCart = async (storeId, menuId, userId) => {
-    // 사용자의 cart 가져오기(userId, menuId로)
-    let cart = await this.cartRepository.getCartByUserIdNMenuId(userId, menuId);
-    if (!cart || cart.storeId != storeId) {
-      // 기존것 삭제 및 새로 생성
+    const isExistMenu = await this.cartRepository.getMenuById(menuId);
+    if (isExistMenu.storeId != storeId)
+      throw new Error(
+        '해당 가게에는 존재하지 않는 메뉴입니다. 다른 메뉴 아이디를 입력해주세요.'
+      );
+
+    // 사용자의 cart 가져오기(userId로)
+    let cart = await this.cartRepository.getCartByUserId(userId);
+
+    if (!cart) {
+      // 새로 생성
       cart = await this.cartRepository.createCart(storeId, menuId, userId);
+    } else if (cart.storeId != storeId) {
+      // 기존것 삭제 및 새로 생성
+      cart = await this.cartRepository.deleteNcreateCart(
+        storeId,
+        menuId,
+        userId,
+        cart.id
+      );
+    } else if (cart.menuId == menuId) {
+      const qty = cart.quantity + 1;
+      cart = await this.cartRepository.updateCart(cart.id, qty);
     } else {
-      // 기존것 업데이트
-      const quantity = cart.quantity;
-      cart = await this.cartRepository.updateCart(menuId, userId, quantity + 1);
+      cart = await this.cartRepository.createCart(storeId, menuId, userId);
     }
     return cart;
   };
 
-  updateQuantity = async (menuId, userId, quantity) => {
-    const cart = await this.cartRepository.updateCart(menuId, userId, quantity);
+  updateQuantity = async (storeId, menuId, userId, quantity) => {
+    if (quantity == undefined || quantity == null)
+      throw new Error('변경하시려는 quantity를 입력해주세요.');
+
+    const isExistCart = await this.cartRepository.getCartByUserIdNMenuId(
+      userId,
+      menuId
+    );
+
+    if (!isExistCart) throw new Error('카트에 존재하지 않는 메뉴입니다');
+
+    if (isExistCart.storeId != storeId) throw new Error('잘못된 파라미터');
+
+    const cart = await this.cartRepository.updateCart(isExistCart.id, quantity);
     return cart;
   };
 
@@ -26,26 +54,32 @@ export class CartService {
   getCart = async (userId) => {
     const carts = await this.cartRepository.getCartsByUserId(userId);
     if (carts.length === 0) return carts;
-
-    const storeName = await this.cartRepository.getStoreNameById(
+    const { storeName } = await this.cartRepository.getStoreNameById(
       carts[0].storeId
     );
     carts.storeName = storeName;
 
     let totalPrice = 0;
-    carts.forEach(async (cart) => {
-      const menu = await this.cartRepository.getMenuById(cart.menuId);
-      cart.menuName = menu.menuName;
-      cart.menuImage = menu.menuImage;
-      cart.price = menu.price;
-      totalPrice += cart.price * cart.quantity;
-    });
+    for (let i = 0; i < carts.length; i++) {
+      const menu = await this.cartRepository.getMenuById(carts[i].menuId);
+      carts[i].menuName = menu.menuName;
+      carts[i].menuImage = menu.menuImage;
+      carts[i].price = menu.price;
+      totalPrice += menu.price * carts[i].quantity;
+    }
+
     carts.totalPrice = totalPrice;
     return carts;
   };
 
   deleteMenu = async (menuId, userId) => {
-    await this.cartRepository.deleteMenuFromCart(menuId, userId);
+    const isExistCart = await this.cartRepository.getCartByUserIdNMenuId(
+      userId,
+      menuId
+    );
+    if (!isExistCart) throw new Error('카트에 존재하지 않는 메뉴입니다');
+
+    await this.cartRepository.deleteCartById(isExistCart.id);
     return;
   };
 }
