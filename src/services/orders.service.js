@@ -10,14 +10,15 @@ export class OrderService {
     if (carts.length === 0) throw new Error('장바구니가 텅 비었어요.');
 
     let totalPrice = 0;
-    carts.forEach(async (cart) => {
-      const menu = await this.cartRepository.getMenuById(cart.menuId);
-      totalPrice += menu.price * cart.quantity;
-    });
+    for (let i = 0; i < carts.length; i++) {
+      const menu = await this.cartRepository.getMenuById(carts[i].menuId);
+      totalPrice += menu.price * carts[i].quantity;
+    }
     // 배송비
     const shippingFee = await this.orderRepository.getShippingFeeByStoreId(
       carts[0].storeId
     );
+
     totalPrice += shippingFee;
 
     // 사용자의 포인트 확인 : 포인트 < totalPrice면 에러
@@ -27,8 +28,11 @@ export class OrderService {
     carts.totalPrice = totalPrice;
 
     // address를 입력하지 않았으면 User 테이블의 사용자 address로 배송
-    if (address === undefined)
+    if (address == undefined || address == null) {
       address = await this.orderRepository.getAddressByUserId(userId);
+      if (address == null) throw new Error('배송지를 입력해주세요.');
+    }
+
     // 있으면 주문 생성
     const order = await this.orderRepository.createOrder(
       carts,
@@ -38,9 +42,14 @@ export class OrderService {
     return order;
   };
 
-  getOrders = async (ownerId) => {
+  getOrdersByOwnerId = async (ownerId) => {
     const storeId = await this.orderRepository.getStoreIdByOwnerId(ownerId);
     const orders = await this.orderRepository.getOrdersByStoreId(storeId);
+    return orders;
+  };
+
+  getOrdersByUserId = async (userId) => {
+    const orders = await this.orderRepository.getOrdersByUserId(userId);
     return orders;
   };
 
@@ -55,15 +64,19 @@ export class OrderService {
       'DELIVERING',
       'DELIVERY_COMPLETE',
     ];
-    if (status === undefined || !status.includes(order_status))
+
+    if (
+      !status ||
+      status == undefined ||
+      order_status.includes(status) == false
+    )
       throw new Error('잘못된 상태입니다.');
 
     const updatedOrder = await this.orderRepository.updateStatus(
       orderId,
       status
     );
-    //const orders = await this.orderRepository.getOrdersByStoreId(storeId);
-    //return orders;
+
     return updatedOrder;
   };
 }

@@ -1,6 +1,4 @@
 import express from 'express';
-import UsersRouter from './routes/users.router.js';
-import AuthRouter from './routes/auth.router.js';
 import CartsRouter from './routes/carts.router.js';
 import OrdersRouter from './routes/orders.router.js';
 import ReviewsRouter from './routes/reviews.router.js';

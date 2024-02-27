@@ -21,10 +21,10 @@ model Users {
   createdAt    DateTime  @default(now()) @map("createdAt")
   updatedAt    DateTime  @updatedAt @map("updatedAt")
   point        Int       @default(1000000) @map("point")
-  carts        Carts?
+  carts        Carts[]
   orders       Orders[]
   reviews      Reviews[]
-  stores       Stores[]  
+  stores       Stores?
 
   @@map("Users")
 }
@@ -108,8 +108,8 @@ model Reviews {
 
 model Carts {
   id        Int      @id @default(autoincrement()) @map("id")
-  userId    Int      @unique @map("userId")
-  storeId   Int      @unique @map("storeId")
+  userId    Int      @map("userId")
+  storeId   Int      @map("storeId")
   menuId    Int      @map("menuId")
   quantity  Int      @default(1) @map("quantity")
   orderId   Int?     @map("orderId")
@@ -119,7 +119,7 @@ model Carts {
   menu      Menu     @relation(fields: [menuId], references: [id], onDelete: Cascade)
   orders    Orders?  @relation(fields: [orderId], references: [id], onDelete: Cascade)
   stores    Stores   @relation(fields: [storeId], references: [id], onDelete: Cascade)
-  users     Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  users     Users?   @relation(fields: [userId], references: [id])
 
   @@index([menuId], map: "Carts_menuId_fkey")
   @@index([orderId], map: "Carts_orderId_fkey")

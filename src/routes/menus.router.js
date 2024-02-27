@@ -11,16 +11,15 @@ import { StoresController } from '../controllers/stores.controller.js';
 const router = express.Router();
 
 // 의존성 주입
-const menuRepository = new MenuRepository(prisma);
-const menuService = new MenuService(menuRepository);
-const menuController = new MenuController(menuService);
 const storesRepository = new StoresRepository(prisma);
-const storesService = new StoresService(storesRepository);
+const menuRepository = new MenuRepository(prisma);
+const menuService = new MenuService(menuRepository, storesRepository);
+const menuController = new MenuController(menuService);
 
 /**
  * 메뉴 등록
  */
-router.post('/menu/:storeId', menuController.createMenu);
+router.post('/menu', menuController.createMenu);
 
 /**
  * 특정 업장 메뉴 전체 조회

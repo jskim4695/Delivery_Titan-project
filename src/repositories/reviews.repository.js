@@ -1,21 +1,21 @@
 export class ReviewRepository {
-  constructor(prisma) {
+  constructor(prisma, orderRepository) {
     this.prisma = prisma;
+    this.orderRepository = orderRepository;
   }
 
-  createReview = async (
-    userId,
-    storeId,
-    orderId,
-    contents,
-    stars,
-    reviewImage
-  ) => {
+  createReview = async (userId, orderId, contents, stars, reviewImage) => {
+    const order = await this.orderRepository.getOrderById(orderId);
+    if (!order) {
+      throw new Error('주문을 찾을수 없습니다.');
+    }
+    const storeId = order.storeId;
+
     const createReview = await this.prisma.reviews.create({
       data: {
         userId,
-        storeId: +storeId,
-        orderId: +orderId,
+        storeId,
+        orderId,
         contents,
         stars,
         reviewImage,
@@ -24,21 +24,15 @@ export class ReviewRepository {
     return createReview;
   };
 
-  updateReview = async (
-    reviewId,
-    userId,
-    // storeId, orderId,
-    contents,
-    stars,
-    reviewImage
-  ) => {
+  updateReview = async (reviewId, userId, contents, stars, reviewImage) => {
     const updateReview = await this.prisma.reviews.update({
       where: {
         reviewId: +reviewId,
-        user: +userId,
-        //  storeId, orderId
       },
       data: {
+        userId,
+        storeId,
+        orderId,
         contents,
         stars,
         reviewImage,
@@ -59,6 +53,7 @@ export class ReviewRepository {
       where: { userId: +userId },
       select: {
         reviewId,
+        storeId,
         contents,
         stars,
         reviewImage,
@@ -75,6 +70,7 @@ export class ReviewRepository {
       where: { storeId: +storeId },
       select: {
         reviewId,
+        userId,
         contents,
         stars,
         reviewImage,

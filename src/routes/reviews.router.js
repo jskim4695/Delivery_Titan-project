@@ -4,15 +4,21 @@ import { authenticateUser } from '../middlewares/auth.middleware.js';
 import { ReviewController } from '../controllers/reviews.controller.js';
 import { ReviewService } from '../services/reviews.service.js';
 import { ReviewRepository } from '../repositories/reviews.repository.js';
+import { OrderRepository } from '../repositories/orders.repository.js';
 
 const router = express.Router();
 
-const reviewRepository = new ReviewRepository(prisma);
+const orderRepository = new OrderRepository(prisma);
+const reviewRepository = new ReviewRepository(prisma, orderRepository);
 const reviewService = new ReviewService(reviewRepository);
 const reviewController = new ReviewController(reviewService);
 
 //리뷰작성
-router.post('/user/review', authenticateUser, reviewController.createReview);
+router.post(
+  '/user/review/:orderId',
+  authenticateUser,
+  reviewController.createReview
+);
 //리뷰수정
 router.patch(
   '/user/review/:reviewId',
@@ -29,7 +35,7 @@ router.delete(
 router.get('/user/review', authenticateUser, reviewController.getReview);
 //업장 리뷰 조회
 router.get(
-  '/user/review/:storeId',
+  '/store/:storeId/review',
   authenticateUser,
   reviewController.getReviewByStoreId
 );

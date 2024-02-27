@@ -3,22 +3,15 @@ export class ReviewService {
     this.reviewRepository = reviewRepository;
   }
   // 리뷰작성
-  createReview = async (
-    userId,
-    storeId,
-    orderId,
-    contents,
-    stars,
-    reviewImage
-  ) => {
+  createReview = async (userId, orderId, contents, stars, reviewImage) => {
     const createReview = await this.reviewRepository.createdReview(
       userId,
-      storeId,
       orderId,
       contents,
       stars,
       reviewImage
     );
+
     return {
       userId: createReview.userId,
       storeId: createReview.storeId,
@@ -30,20 +23,14 @@ export class ReviewService {
   };
 
   //리뷰 수정
-  updateReview = async (
-    reviewId,
-    userId,
-    // storeId, orderId,
-    contents,
-    stars,
-    reviewImage
-  ) => {
+  updateReview = async (reviewId, userId, contents, stars, reviewImage) => {
     const review = await this.reviewRepository.getReview(reviewId);
-
+    if (!review) {
+      throw new Error('리뷰가 없습니다.');
+    }
     await this.reviewRepository.updateReview(
       reviewId,
       userId,
-      //  storeId, orderId,
       contents,
       stars,
       reviewImage
@@ -51,8 +38,8 @@ export class ReviewService {
     const updateReview = await this.reviewRepository.getReview(reviewId);
     return {
       userId: updateReview.userId,
-      // storeId: updateReview.storeId,
-      // orderId: updateReview.orderId,
+      storeId: updateReview.storeId,
+      orderId: updateReview.orderId,
       contents: updateReview.contents,
       stars: updateReview.stars,
       reviewImage: updateReview.reviewImage,
@@ -61,6 +48,9 @@ export class ReviewService {
 
   //리뷰 삭제
   deleteReview = async (userId, reviewId) => {
+    if (!userId || !reviewId) {
+      throw new Error('id값이 존재하지 않습니다.');
+    }
     const deleteReview = await this.reviewRepository.deleteReview(
       userId,
       reviewId
@@ -71,11 +61,17 @@ export class ReviewService {
   //리뷰 조회 개인
   getReview = async (userId) => {
     const getReview = await this.reviewRepository.getReview(userId);
+    if (!getReview) {
+      throw new Error('리뷰가 없습니다.');
+    }
     return getReview;
   };
   //리뷰 조회 업자
   getReviewByStoreId = async (storeId) => {
     const getReview = await this.reviewRepository.getReview(storeId);
+    if (!getReview) {
+      throw new Error('리뷰가 없습니다.');
+    }
     return getReview;
   };
 }
