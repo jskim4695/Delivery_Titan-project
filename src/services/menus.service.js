@@ -1,10 +1,10 @@
 import { ApiError } from '../middlewares/error-handling.middleware.js';
 
 export class MenuService {
-    constructor(menuRepository, storesRepository) {
-      this.menuRepository = menuRepository;
-      this.storesRepository = storesRepository;
-    }
+  constructor(menuRepository, storesRepository) {
+    this.menuRepository = menuRepository;
+    this.storesRepository = storesRepository;
+  }
   /**
    * 특정 업장 전체 메뉴 데이터 조회
    * @returns
@@ -42,12 +42,12 @@ export class MenuService {
    * @returns
    */
   createMenu = async (storeId, menuName, menuInfo, menuImage, price) => {
+    const existingStore = await this.storesRepository.findStoreById(storeId);
+    console.log(storeId);
 
-    // const existingStore = await this.storesRepository.findStoreById(+storeId);
-
-    // if(!existingStore){
-    //     throw new ApiError(404, `해당 업장이 존재하지 않습니다.`);
-    // }
+    if (!existingStore) {
+      throw new ApiError(404, `해당 업장이 존재하지 않습니다.`);
+    }
 
     const createdMenu = await this.menuRepository.createMenu(
       storeId,
@@ -92,7 +92,7 @@ export class MenuService {
     const menu = await this.menuRepository.findMenuById(menuId);
 
     if (!menu) {
-      throw new ApiError(404, `해당 업장 정보가 없습니다.`);
+      throw new ApiError(404, `해당 메뉴 정보가 없습니다.`);
     }
 
     // if (menu.ownerId != loginId) {

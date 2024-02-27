@@ -68,12 +68,16 @@ export class MenuController {
     }
   };
 
-  /* 업장 정보 업데이트 */
+  /* 메뉴 정보 업데이트 */
   updateMenu = async (req, res, next) => {
     try {
       const { menuId } = req.params;
       //const loginId = req.user.userId;
       const { menuName, menuInfo, menuImage, price } = req.body;
+
+      if (!menuId) {
+        throw new ApiError(404, `메뉴 아이디를 받아오지 못했습니다.`);
+      }
 
       const updatedMenu = await this.menuService.updateMenu(
         //loginId,
