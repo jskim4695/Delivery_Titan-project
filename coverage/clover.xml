@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1708954371470" clover="3.2.0">
-  <project timestamp="1708954371470" name="All files">
-    <metrics statements="25" coveredstatements="10" conditionals="0" coveredconditionals="0" methods="9" coveredmethods="2" elements="34" coveredelements="12" complexity="0" loc="25" ncloc="25" packages="1" files="1" classes="1"/>
+<coverage generated="1708956602926" clover="3.2.0">
+  <project timestamp="1708956602926" name="All files">
+    <metrics statements="25" coveredstatements="12" conditionals="0" coveredconditionals="0" methods="9" coveredmethods="3" elements="34" coveredelements="15" complexity="0" loc="25" ncloc="25" packages="1" files="1" classes="1"/>
     <file name="carts.repository.js" path="C:\Users\tntnc\OneDrive\바탕 화면\sparta\deli-titan\src\repositories\carts.repository.js">
-      <metrics statements="25" coveredstatements="10" conditionals="0" coveredconditionals="0" methods="9" coveredmethods="2"/>
+      <metrics statements="25" coveredstatements="12" conditionals="0" coveredconditionals="0" methods="9" coveredmethods="3"/>
       <line num="3" count="1" type="stmt"/>
       <line num="6" count="1" type="stmt"/>
       <line num="7" count="1" type="stmt"/>
       <line num="10" count="1" type="stmt"/>
       <line num="13" count="1" type="stmt"/>
-      <line num="14" count="0" type="stmt"/>
+      <line num="14" count="1" type="stmt"/>
       <line num="15" count="0" type="stmt"/>
       <line num="18" count="0" type="stmt"/>
       <line num="25" count="0" type="stmt"/>
-      <line num="27" count="0" type="stmt"/>
+      <line num="27" count="1" type="stmt"/>
       <line num="30" count="1" type="stmt"/>
       <line num="31" count="0" type="stmt"/>
       <line num="35" count="0" type="stmt"/>

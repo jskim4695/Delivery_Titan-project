@@ -4,7 +4,7 @@ export class OrderRepository {
   }
 
   getAddressByUserId = async (userId) => {
-    const address = await this.prisma.users.findUnique({
+    const { address } = await this.prisma.users.findUnique({
       where: { id: +userId },
       select: { address: true },
     });
@@ -23,7 +23,7 @@ export class OrderRepository {
         },
       });
       //카트 status, orderId 수정
-      await tx.carts.update({
+      await tx.carts.updateMany({
         where: { userId: +userId },
         data: {
           orderId: +order.id,
@@ -44,7 +44,7 @@ export class OrderRepository {
         where: { id: +userId },
         data: {
           point: {
-            decrement: [carts.totalPrice],
+            decrement: carts.totalPrice,
           },
         },
       });
@@ -55,7 +55,7 @@ export class OrderRepository {
   };
 
   getPointById = async (userId) => {
-    const point = await this.prisma.users.findUnique({
+    const { point } = await this.prisma.users.findUnique({
       where: { id: +userId },
       select: { point: true },
     });
@@ -65,12 +65,13 @@ export class OrderRepository {
   getStoreIdByOwnerId = async (ownerId) => {
     const storeId = await this.prisma.stores.findUnique({
       where: { ownerId: +ownerId },
+      select: { id: true },
     });
-    return storeId;
+    return storeId.id;
   };
 
   getShippingFeeByStoreId = async (storeId) => {
-    const shippingFee = await this.prisma.stores.findUnique({
+    const { shippingFee } = await this.prisma.stores.findUnique({
       where: { id: +storeId },
       select: { shippingFee: true },
     });
@@ -78,7 +79,7 @@ export class OrderRepository {
   };
 
   getOrdersByStoreId = async (storeId) => {
-    // 주문 번호, 주문 주소, 주문 상태(역순 정렬)
+    // 주문 번호, 주문 주소, 주문 상태
     const orders = await this.prisma.orders.findMany({
       where: { storeId: +storeId },
       select: {
@@ -87,17 +88,15 @@ export class OrderRepository {
         status: true,
       },
       orderBy: {
-        status: 'desc',
         createdAt: 'desc',
       },
     });
     // 메뉴 이름, 메뉴 이미지, 메뉴 가격, 주문 수량 (Carts 중 status가 unavailable인 것들)
-    orders.forEach(async (order) => {
+    for (let i = 0; i < orders.length; i++) {
       // 1개 주문 당 N개 카트
-      let menuList = [];
       const carts = await this.prisma.carts.findMany({
         where: {
-          orderId: +order.id,
+          orderId: +orders[i].id,
           status: 'UNAVAILABLE',
         },
         select: {
@@ -106,21 +105,69 @@ export class OrderRepository {
         },
       });
 
-      carts.forEach(async (cart) => {
+      let menuList = [];
+      for (let j = 0; j < carts.length; j++) {
         const menu = await this.prisma.menu.findUnique({
-          where: { id: +cart.menuId },
+          where: { id: +carts[j].menuId },
           select: { menuImage: true, menuName: true, price: true },
         });
-        menu.quantity = cart.quantity;
-        menuList.add(menu);
-      });
-
-      order.menuList = menuList;
-    });
+        menu.quantity = carts[j].quantity;
+        menuList.push(menu);
+      }
+      orders[i].menuList = menuList;
+    }
 
     return orders;
   };
 
+  getOrdersByUserId = async (userId) => {
+    // 주문 번호, 주문 주소, 주문 상태
+    const orders = await this.prisma.orders.findMany({
+      where: { userId: +userId },
+      select: {
+        id: true,
+        address: true,
+        status: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+    // 메뉴 이름, 메뉴 이미지, 메뉴 가격, 주문 수량 (Carts 중 status가 unavailable인 것들)
+    for (let i = 0; i < orders.length; i++) {
+      // 1개 주문 당 N개 카트
+      const carts = await this.prisma.carts.findMany({
+        where: {
+          orderId: +orders[i].id,
+          status: 'UNAVAILABLE',
+        },
+        select: {
+          menuId: true,
+          quantity: true,
+        },
+      });
+
+      let menuList = [];
+      for (let j = 0; j < carts.length; j++) {
+        const menu = await this.prisma.menu.findUnique({
+          where: { id: +carts[j].menuId },
+          select: { menuImage: true, menuName: true, price: true },
+        });
+        menu.quantity = carts[j].quantity;
+        menuList.push(menu);
+      }
+      orders[i].menuList = menuList;
+    }
+
+    return orders;
+  };
+
+  getOrderById = async (orderId) => {
+    const order = await this.prisma.orders.findUnique({
+      where: { id: +orderId },
+    });
+    return order;
+  };
   updateStatus = async (orderId, status) => {
     const order = await this.prisma.orders.update({
       where: { id: +orderId },

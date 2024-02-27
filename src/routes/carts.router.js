@@ -18,11 +18,11 @@ router.post(
 );
 // TODO 주석 해제하기
 /** 카트의 메뉴 수량 변경 */
-// router.update(
-//   '/main/store/:storeId/:menuId/cart',
-//   authenticateUser,
-//   cartController.updateQuantity
-// );
+router.patch(
+  '/main/store/:storeId/:menuId/cart',
+  authenticateUser,
+  cartController.updateQuantity
+);
 
 /** 내 카트 조회 */
 router.get('/user/cart', authenticateUser, cartController.getCart);

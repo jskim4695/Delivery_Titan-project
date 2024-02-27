@@ -15,14 +15,14 @@ const orderController = new OrderController(orderService);
 /** 카트로 주문하기(고객) */
 router.post('/user/cart/order', authenticateUser, orderController.createOrder);
 
-/** 주문 확인하기(사장) */
-router.post('/user/order', authenticateUser, orderController.getOrders);
-// TODO 주석 해제 필요
-/** 배달 완료로 주문 상태 변경하기 (사장) */
-// router.update(
-//   '/user/order/:orderId',
-//   authenticateUser,
-//   orderController.updateStatus
-// );
+/** 주문 확인하기(고객, 사장) */
+router.get('/user/order', authenticateUser, orderController.getOrders);
+
+/** 주문 상태 변경하기 (사장) */
+router.patch(
+  '/user/order/:orderId',
+  authenticateUser,
+  orderController.updateStatus
+);
 
 export default router;

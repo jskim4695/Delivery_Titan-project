@@ -28,11 +28,12 @@ export class CartController {
   /** 카트에 담긴 메뉴 수량 변경 */
   updateQuantity = async (req, res, next) => {
     try {
-      const { menuId } = req.params;
+      const { storeId, menuId } = req.params;
       const { quantity } = req.body;
       const userId = req.userId;
 
       const cart = await this.cartService.updateQuantity(
+        storeId,
         menuId,
         userId,
         quantity
