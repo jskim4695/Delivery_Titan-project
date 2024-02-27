@@ -1,11 +1,8 @@
 import { beforeEach, jest } from '@jest/globals';
-import { CartRepository } from '../../src/repositories/carts.repository';
+import { CartRepository } from '../../../src/repositories/carts.repository';
 
 let prisma = {
-  $transaction: jest.fn().mockImplementation(async (tx) => {
-    const operations = await tx(prisma);
-    return operations;
-  }),
+  $transaction: jest.fn(),
   carts: {
     findUnique: jest.fn(),
     delete: jest.fn(),
@@ -20,6 +17,9 @@ let cartRepository = new CartRepository(prisma);
 describe('Cart Repository Unit Test', () => {
   beforeEach(() => {
     jest.resetAllMocks();
+    jest.spyOn(prisma, '$transaction').mockImplementation((callback) => {
+      return callback(prisma);
+    });
   });
 
   const sampleCart = {
