@@ -67,7 +67,7 @@ export class OrderRepository {
       where: { ownerId: +ownerId },
       select: { id: true },
     });
-    return storeId.id;
+    return storeId;
   };
 
   getShippingFeeByStoreId = async (storeId) => {

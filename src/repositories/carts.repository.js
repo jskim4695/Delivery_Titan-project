@@ -21,6 +21,7 @@ export class CartRepository {
 
     return cart;
   };
+
   deleteNcreateCart = async (storeId, menuId, userId, cartId) => {
     const cart = await this.prisma.$transaction(async (tx) => {
       await tx.carts.delete({
@@ -52,6 +53,7 @@ export class CartRepository {
     });
     return cart;
   };
+
   getCartsByUserId = async (userId) => {
     const carts = await this.prisma.carts.findMany({
       where: { userId: +userId, status: 'AVAILABLE' },
