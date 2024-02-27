@@ -1,0 +1,130 @@
+import { ApiError } from '../middlewares/error-handling.middleware.js';
+
+export class MenuService {
+    constructor(menuRepository, storesRepository) {
+      this.menuRepository = menuRepository;
+      this.storesRepository = storesRepository;
+    }
+  /**
+   * 특정 업장 전체 메뉴 데이터 조회
+   * @returns
+   */
+  findAllMenu = async (storeId) => {
+    const menu = await this.menuRepository.findAllMenu(storeId);
+
+    if (!menu) {
+      throw new ApiError(404, `등록한 메뉴 데이터가 없습니다.`);
+    }
+
+    menu.sort((a, b) => {
+      return b.createdAt - a.createdAt;
+    });
+
+    return menu.map((menu) => {
+      return {
+        storeId: menu.storeId,
+        storeName: menu.store.storeName,
+        menuName: menu.menuName,
+        menuInfo: menu.menuInfo,
+        menuImage: menu.menuImage,
+        price: menu.price,
+      };
+    });
+  }; // findAllMenu
+
+  /**
+   *
+   * @param {*} ownerId
+   * @param {*} menuName
+   * @param {*} category
+   * @param {*} menuImage
+   * @param {*} menuIntro
+   * @returns
+   */
+  createMenu = async (storeId, menuName, menuInfo, menuImage, price) => {
+
+    // const existingStore = await this.storesRepository.findStoreById(+storeId);
+
+    // if(!existingStore){
+    //     throw new ApiError(404, `해당 업장이 존재하지 않습니다.`);
+    // }
+
+    const createdMenu = await this.menuRepository.createMenu(
+      storeId,
+      menuName,
+      menuInfo,
+      menuImage,
+      price
+    );
+
+    return {
+      storeId: createdMenu.storeId,
+      menuName: createdMenu.menuName,
+      menuInfo: createdMenu.menuInfo,
+      menuImage: createdMenu.menuImage,
+      price: createdMenu.price,
+    };
+  }; // createdMenu
+
+  /**
+   * 특정 업장 조회
+   * @param {*} menuId
+   * @returns
+   */
+  findMenuById = async (menuId) => {
+    const menu = await this.menuRepository.findMenuById(menuId);
+
+    if (!menu) {
+      throw new ApiError(404, `해당 메뉴가 없습니다.`);
+    }
+
+    return {
+      storeId: menu.storeId,
+      storeName: menu.store.storeName,
+      menuName: menu.menuName,
+      menuImage: menu.menuImage,
+      menuInfo: menu.menuInfo,
+      price: menu.price,
+    };
+  };
+
+  updateMenu = async (menuId, menuName, menuInfo, menuImage, price) => {
+    const menu = await this.menuRepository.findMenuById(menuId);
+
+    if (!menu) {
+      throw new ApiError(404, `해당 업장 정보가 없습니다.`);
+    }
+
+    // if (menu.ownerId != loginId) {
+    // 	throw new ApiError(403, `본인의 업장 정보만 수정 가능합니다.`);
+    // }
+
+    await this.menuRepository.updateMenu(
+      menuId,
+      menuName,
+      menuInfo,
+      menuImage,
+      price
+    );
+
+    return {
+      message: '정상 수정되었습니다.',
+    };
+  };
+
+  deleteMenu = async (menuId, loginId) => {
+    const menu = await this.menuRepository.findMenuById(menuId);
+    if (!menu) {
+      throw new ApiError(404, `존재하지 않는 메뉴입니다.`);
+    }
+    // if (menu.ownerId != loginId) {
+    // 	throw new ApiError(403, `본인 소유의 업장만 삭제 가능합니다.`);
+    // }
+
+    await this.menuRepository.deleteMenu(menuId);
+
+    return {
+      message: '정상 삭제되었습니다.',
+    };
+  };
+}
