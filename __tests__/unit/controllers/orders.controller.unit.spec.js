@@ -31,6 +31,7 @@ describe('Order Controller Unit Test', () => {
     userId: 1,
     address: 'Seoul Seongworgokdong 21',
     totalPrice: 34000,
+    status: 'ORDER_COMPLETE',
     createdAt: '2024-02-25T06:38:42.129Z',
     updatedAt: '2024-02-25T06:38:42.129Z',
   };
@@ -42,6 +43,7 @@ describe('Order Controller Unit Test', () => {
       userId: 1,
       address: 'Seoul Seongworgokdong 21',
       totalPrice: 34000,
+      status: 'ORDER_COMPLETE',
       createdAt: '2024-02-25T06:38:42.129Z',
       updatedAt: '2024-02-25T06:38:42.129Z',
     },
@@ -51,6 +53,7 @@ describe('Order Controller Unit Test', () => {
       userId: 2,
       address: 'Seoul Haworgokdong 22',
       totalPrice: 50000,
+      status: 'ORDER_COMPLETE',
       createdAt: '2024-02-26T06:38:42.129Z',
       updatedAt: '2024-02-26T06:38:42.129Z',
     },

@@ -205,9 +205,10 @@ describe('Cart Repository Unit Test', () => {
     const sampleStoreName = {
       storeName: 'Lee Chicken',
     };
+
     prisma.stores.findUnique.mockReturnValue(sampleStoreName);
     const result = await cartRepository.getStoreNameById(storeId);
-    console.log('엥', result);
+
     // 검증
     expect(result).toEqual(sampleStoreName);
     expect(prisma.stores.findUnique).toHaveBeenCalledTimes(1);
