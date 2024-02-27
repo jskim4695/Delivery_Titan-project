@@ -56,7 +56,7 @@ export class UserService {
         });
       }
     } catch (err) {
-      console.log(err);
+      throw err;
     }
   };
 
@@ -120,7 +120,7 @@ export class UserService {
         refreshToken,
       });
     } catch (err) {
-      console.log(err);
+      throw err;
     }
   };
 

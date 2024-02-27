@@ -56,18 +56,22 @@ export class UserController {
         });
       }
 
-      await this.userService.userSignUp({
-        email,
-        clientId,
-        password,
-        name,
-        nickname,
-        phone,
-        address,
-        role,
-      });
+      try {
+        await this.userService.userSignUp({
+          email,
+          clientId,
+          password,
+          name,
+          nickname,
+          phone,
+          address,
+          role,
+        });
 
-      return res.status(201).json({ name, nickname, phone, address, role });
+        return res.status(201).json({ name, nickname, phone, address, role });
+      } catch (err) {
+        return res.status(err.code).json({ message: err.message });
+      }
     }
   };
 
@@ -82,7 +86,7 @@ export class UserController {
       });
       return res.json(token);
     } catch (err) {
-      return res.status(err.code || 500).json({ message: err.message });
+      return res.status(err.code).json({ message: err.message });
     }
   };
 
@@ -118,7 +122,7 @@ export class UserController {
         });
       }
 
-      await userService.updateUser({
+      await this.userService.updateUser({
         userId,
         data: {
           email,
