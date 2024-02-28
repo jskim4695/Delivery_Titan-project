@@ -7,6 +7,7 @@ let prisma = {
     findFirst: jest.fn(),
     findUnique: jest.fn(),
     delete: jest.fn(),
+    deleteMany: jest.fn(),
     create: jest.fn(),
     update: jest.fn(),
     findMany: jest.fn(),
@@ -66,21 +67,6 @@ describe('Cart Repository Unit Test', () => {
     },
   ];
 
-  test('getCartByUserId 테스트', async () => {
-    // params
-    const userId = 1;
-
-    prisma.carts.findFirst.mockReturnValue(sampleCart);
-    const result = await cartRepository.getCartByUserId(userId);
-
-    // 검증
-    expect(result).toEqual(sampleCart);
-    expect(prisma.carts.findFirst).toHaveBeenCalledTimes(1);
-    expect(prisma.carts.findFirst).toHaveBeenCalledWith({
-      where: { userId: +userId, status: 'AVAILABLE' },
-    });
-  });
-
   test('createCart 테스트', async () => {
     // params
     const storeId = 1,
@@ -108,19 +94,23 @@ describe('Cart Repository Unit Test', () => {
     const storeId = 1,
       menuId = 1,
       userId = 1,
-      cartId = 1;
+      cartIds = [1];
     prisma.carts.create.mockReturnValue(sampleCart);
     const result = await cartRepository.deleteNcreateCart(
       storeId,
       menuId,
       userId,
-      cartId
+      cartIds
     );
     // 검증
     expect(result).toEqual(sampleCart);
-    expect(prisma.carts.delete).toHaveBeenCalledTimes(1);
-    expect(prisma.carts.delete).toHaveBeenCalledWith({
-      where: { id: +cartId },
+    expect(prisma.carts.deleteMany).toHaveBeenCalledTimes(1);
+    expect(prisma.carts.deleteMany).toHaveBeenCalledWith({
+      where: {
+        id: {
+          in: cartIds,
+        },
+      },
     });
     expect(prisma.carts.create).toHaveBeenCalledTimes(1);
     expect(prisma.carts.create).toHaveBeenCalledWith({
