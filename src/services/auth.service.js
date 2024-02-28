@@ -1,5 +1,5 @@
-import jwt from "jsonwebtoken";
-import { UserRepository } from "../repositories/users.repository.js";
+import jwt from 'jsonwebtoken';
+import { UserRepository } from '../repositories/users.repository.js';
 
 export class AuthService {
   verifyFreshToken = async (refreshToken) => {
@@ -10,7 +10,7 @@ export class AuthService {
     if (!token.userId) {
       throw {
         code: 401,
-        message: "토큰 정보가 올바르지 않습니다.",
+        message: '토큰 정보가 올바르지 않습니다.',
       };
     }
 
@@ -19,7 +19,7 @@ export class AuthService {
     if (!user) {
       throw {
         code: 401,
-        message: "토큰 정보가 올바르지 않습니다.",
+        message: '토큰 정보가 올바르지 않습니다.',
       };
     }
 
@@ -28,14 +28,14 @@ export class AuthService {
       { userId: user.userId },
       process.env.REFRESH_TOKEN_SECRET_KEY,
       {
-        expiresIn: "12h",
+        expiresIn: '12h',
       }
     );
     const newRefreshToken = jwt.sign(
       { userId: user.userId },
       process.env.REFRESH_TOKEN_SECRET_KEY,
       {
-        expiresIn: "7d",
+        expiresIn: '7d',
       }
     );
 
