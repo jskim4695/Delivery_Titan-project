@@ -32,11 +32,11 @@ export class MenuRepository {
   createMenu = async (storeId, menuName, menuInfo, menuImage, price) => {
     const createdMenu = await this.prisma.menu.create({
       data: {
-        storeId,
+        storeId: +storeId,
         menuName,
         menuInfo,
         menuImage,
-        price,
+        price: +price,
       },
     });
 

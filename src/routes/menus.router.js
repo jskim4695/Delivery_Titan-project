@@ -9,6 +9,7 @@ import { StoresService } from '../services/stores.service.js';
 import { StoresController } from '../controllers/stores.controller.js';
 import { uploadMenuImg } from '../utils/multer/multer.js';
 import { authenticateUser } from '../middlewares/auth.middleware.js';
+import { checkRole } from '../middlewares/auth-role.middleware.js';
 
 const router = express.Router();
 
@@ -24,6 +25,7 @@ const menuController = new MenuController(menuService);
 router.post(
   '/menu',
   authenticateUser,
+  checkRole('OWNER'),
   uploadMenuImg.single('menuImage'),
   menuController.createMenu
 );
@@ -43,6 +45,7 @@ router.get('/menu/:menuId', menuController.getMenuById);
 router.patch(
   '/menu/:menuId',
   authenticateUser,
+  checkRole('OWNER'),
   uploadMenuImg.single('menuImage'),
   menuController.updateMenu
 );
@@ -50,7 +53,12 @@ router.patch(
 /**
  * 메뉴 삭제
  */
-router.delete('/menu/:menuId', authenticateUser, menuController.deleteMenu);
+router.delete(
+  '/menu/:menuId',
+  authenticateUser,
+  checkRole('OWNER'),
+  menuController.deleteMenu
+);
 
 router.use(errorHandler);
 

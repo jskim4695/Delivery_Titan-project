@@ -4,6 +4,8 @@ import { CartController } from '../controllers/carts.controller.js';
 import { CartService } from '../services/carts.service.js';
 import { CartRepository } from '../repositories/carts.repository.js';
 import { authenticateUser } from '../middlewares/auth.middleware.js';
+import { checkRole } from '../middlewares/auth-role.middleware.js';
+
 const router = express.Router();
 
 const cartRepository = new CartRepository(prisma);
@@ -14,6 +16,7 @@ const cartController = new CartController(cartService);
 router.post(
   '/main/store/:storeId/:menuId/cart',
   authenticateUser,
+  checkRole('CUSTOMER'),
   cartController.addToCart
 );
 
@@ -21,16 +24,23 @@ router.post(
 router.patch(
   '/main/store/:storeId/:menuId/cart',
   authenticateUser,
+  checkRole('CUSTOMER'),
   cartController.updateQuantity
 );
 
 /** 내 카트 조회 */
-router.get('/user/cart', authenticateUser, cartController.getCart);
+router.get(
+  '/user/cart',
+  authenticateUser,
+  checkRole('CUSTOMER'),
+  cartController.getCart
+);
 
 /** 카트에서 삭제 */
 router.delete(
   '/user/cart/:menuId',
   authenticateUser,
+  checkRole('CUSTOMER'),
   cartController.deleteMenu
 );
 
