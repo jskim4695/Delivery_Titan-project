@@ -2,7 +2,7 @@ import {
   ApiError,
   BadRequestError,
   NotFoundError,
-} from '../middlewares/error-handling.middleware';
+} from '../middlewares/error-handling.middleware.js';
 
 export class OrderService {
   constructor(orderRepository, cartRepository) {
