@@ -12,7 +12,6 @@ export class MainRepository {
       },
       select: {
         storeId: true,
-        menuName: true,
       },
     });
 
