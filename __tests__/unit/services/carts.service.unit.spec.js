@@ -36,7 +36,7 @@ describe('Cart Service Unit Test', () => {
     updatedAt: '2024-02-20T06:50:42.129Z',
   };
 
-  test('addToCart 테스트 by NotFoundError', async () => {
+  test('addToCart 테스트 by NotFoundError(가게에 추가하려는 메뉴가 존재하지 않을 때)', async () => {
     const storeId = 1;
     const menuId = 1;
     const userId = 1;
@@ -76,7 +76,7 @@ describe('Cart Service Unit Test', () => {
     };
 
     cartRepository.getMenuById.mockResolvedValue(sampleMenu);
-    cartRepository.getCartByUserId.mockResolvedValue(null);
+    cartRepository.getCartsByUserId.mockResolvedValue([]);
     cartRepository.createCart.mockResolvedValue(sampleCart);
 
     const result = await cartService.addToCart(storeId, menuId, userId);
@@ -88,11 +88,11 @@ describe('Cart Service Unit Test', () => {
     );
   });
 
-  test('addToCart 테스트(고객의 기존 카트의 storeId가 새로 추가하려는 menu의 storeId와 다를 때)', async () => {
+  test('addToCart 테스트(다른 가게에서 메뉴를 담으려고 할 때)', async () => {
     const storeId = 2;
     const menuId = 2;
     const userId = 1;
-    const cartId = 1;
+    const cartIds = [1];
 
     const sampleMenu = {
       id: 2,
@@ -105,7 +105,7 @@ describe('Cart Service Unit Test', () => {
 
     const resultCart = {
       id: 2,
-      menuId: 2,
+      menuId: 8,
       orderId: null,
       quantity: 1,
       status: 'AVAILABLE',
@@ -116,7 +116,7 @@ describe('Cart Service Unit Test', () => {
     };
 
     cartRepository.getMenuById.mockResolvedValue(sampleMenu);
-    cartRepository.getCartByUserId.mockResolvedValue(sampleCart);
+    cartRepository.getCartsByUserId.mockResolvedValue([sampleCart]);
     cartRepository.deleteNcreateCart.mockResolvedValue(resultCart);
 
     const result = await cartService.addToCart(storeId, menuId, userId);
@@ -125,15 +125,15 @@ describe('Cart Service Unit Test', () => {
       storeId,
       menuId,
       userId,
-      cartId
+      cartIds
     );
   });
 
-  test('addToCart 테스트(추가하려는 메뉴가 이미 카트에 존재할 때)', async () => {
+  test('addToCart 테스트(같은 가게에서 같은 메뉴를 담으려고 할 때)', async () => {
     const storeId = 1;
     const menuId = 1;
     const userId = 1;
-    const cartId = 1;
+    const cartIds = [1, 2];
 
     const sampleMenu = {
       id: 1,
@@ -145,7 +145,7 @@ describe('Cart Service Unit Test', () => {
     };
 
     cartRepository.getMenuById.mockResolvedValue(sampleMenu);
-    cartRepository.getCartByUserId.mockResolvedValue(sampleCart);
+    cartRepository.getCartsByUserId.mockResolvedValue([sampleCart]);
     cartRepository.updateCart.mockResolvedValue({
       ...sampleCart,
       quantity: sampleCart.quantity + 1,
@@ -158,12 +158,12 @@ describe('Cart Service Unit Test', () => {
       quantity: sampleCart.quantity + 1,
     });
     expect(cartRepository.updateCart).toHaveBeenCalledWith(
-      cartId,
+      cartIds[0],
       sampleCart.quantity + 1
     );
   });
 
-  test('addToCart 테스트(정상)', async () => {
+  test('addToCart 테스트(같은 가게에서 다른 메뉴를 담을 때)', async () => {
     const storeId = 1;
     const menuId = 3;
     const userId = 1;
@@ -189,7 +189,7 @@ describe('Cart Service Unit Test', () => {
       updatedAt: '2024-02-22T06:50:42.129Z',
     };
     cartRepository.getMenuById.mockResolvedValue(sampleMenu);
-    cartRepository.getCartByUserId.mockResolvedValue(sampleCart);
+    cartRepository.getCartsByUserId.mockResolvedValue([sampleCart]);
     cartRepository.createCart.mockResolvedValue(resultCart);
 
     const result = await cartService.addToCart(storeId, menuId, userId);
