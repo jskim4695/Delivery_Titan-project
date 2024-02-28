@@ -97,7 +97,6 @@ describe('Order Repository Unit Test', () => {
     const userId = 1;
     const address = 'Seoul Seongworgokdong 21';
 
-    //prisma.orders.create.mockResolvedValue(sampleOrder);
     prisma.$transaction.mockResolvedValue(sampleOrder);
 
     const result = await orderRepository.createOrder(
@@ -108,10 +107,6 @@ describe('Order Repository Unit Test', () => {
 
     expect(result).toEqual(sampleOrder);
     expect(prisma.$transaction).toHaveBeenCalled();
-    //expect(prisma.orders.create).toHaveBeenCalledTimes(1);
-    // expect(prisma.carts.updateMany).toHaveBeenCalledTimes(1);
-    // expect(prisma.stores.update).toHaveBeenCalledTimes(1);
-    // expect(prisma.users.update).toHaveBeenCalledTimes(1);
   });
 
   test('createOrder 테스트 (transaction 실패)', async () => {
