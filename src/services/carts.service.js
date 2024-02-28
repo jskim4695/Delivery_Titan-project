@@ -1,7 +1,7 @@
 import {
   NotFoundError,
   BadRequestError,
-} from '../middlewares/error-handling.middleware';
+} from '../middlewares/error-handling.middleware.js';
 
 export class CartService {
   constructor(cartRepository) {
