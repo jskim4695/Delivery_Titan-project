@@ -189,22 +189,23 @@ describe('Cart Repository Unit Test', () => {
     });
   });
 
-  test('getStoreNameById 테스트', async () => {
+  test('getStoreInfoById 테스트', async () => {
     // params
     const storeId = 1;
     const sampleStoreName = {
       storeName: 'Lee Chicken',
+      shippingFee: 3000,
     };
 
     prisma.stores.findUnique.mockReturnValue(sampleStoreName);
-    const result = await cartRepository.getStoreNameById(storeId);
+    const result = await cartRepository.getStoreInfoById(storeId);
 
     // 검증
     expect(result).toEqual(sampleStoreName);
     expect(prisma.stores.findUnique).toHaveBeenCalledTimes(1);
     expect(prisma.stores.findUnique).toHaveBeenCalledWith({
       where: { id: +storeId },
-      select: { storeName: true },
+      select: { storeName: true, shippingFee: true },
     });
   });
 

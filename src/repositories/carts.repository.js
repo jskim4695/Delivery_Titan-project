@@ -65,12 +65,12 @@ export class CartRepository {
     return menu;
   };
 
-  getStoreNameById = async (storeId) => {
-    const storeName = await this.prisma.stores.findUnique({
+  getStoreInfoById = async (storeId) => {
+    const storeInfo = await this.prisma.stores.findUnique({
       where: { id: +storeId },
-      select: { storeName: true },
+      select: { storeName: true, shippingFee: true },
     });
-    return storeName;
+    return storeInfo;
   };
 
   deleteCartById = async (cartId) => {

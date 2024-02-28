@@ -75,10 +75,8 @@ export class CartService {
   getCart = async (userId) => {
     const carts = await this.cartRepository.getCartsByUserId(userId);
     if (carts.length === 0) return carts;
-    const { storeName } = await this.cartRepository.getStoreNameById(
-      carts[0].storeId
-    );
-    carts.storeName = storeName;
+    const { storeName, shippingFee } =
+      await this.cartRepository.getStoreInfoById(carts[0].storeId);
 
     let totalPrice = 0;
     for (let i = 0; i < carts.length; i++) {
@@ -88,8 +86,8 @@ export class CartService {
       carts[i].price = menu.price;
       totalPrice += menu.price * carts[i].quantity;
     }
+    carts.push({ storeName, shippingFee, totalPrice });
 
-    carts.totalPrice = totalPrice;
     return carts;
   };
 
