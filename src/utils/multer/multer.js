@@ -58,3 +58,16 @@ export const uploadMenuImg = multer({
   }),
   limits: { fileSize: 1024 * 1024 * 100 },
 });
+
+export const uploadReviewImg = multer({
+  storage: multerS3({
+    s3,
+    bucket: bucketName,
+    contentType: multerS3.AUTO_CONTENT_TYPE,
+    key: (req, file, cb) => {
+      const ext = file.mimetype.split('/')[1];
+      cb(null, `reviewImage/${randomName()}.${ext}`);
+    },
+  }),
+  limits: { fileSize: 1024 * 1024 * 100 },
+});

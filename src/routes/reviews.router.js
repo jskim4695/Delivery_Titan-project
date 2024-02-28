@@ -6,6 +6,7 @@ import { ReviewService } from '../services/reviews.service.js';
 import { ReviewRepository } from '../repositories/reviews.repository.js';
 import { OrderRepository } from '../repositories/orders.repository.js';
 import { checkRole } from '../middlewares/auth-role.middleware.js';
+import { uploadReviewImg } from '../utils/multer/multer.js';
 
 const router = express.Router();
 
@@ -19,6 +20,7 @@ router.post(
   '/user/review/:orderId',
   authenticateUser,
   checkRole('CUSTOMER'),
+  uploadReviewImg.single('reviewImage'),
   reviewController.createReview
 );
 //리뷰수정
@@ -26,6 +28,7 @@ router.patch(
   '/user/review/:reviewId',
   authenticateUser,
   checkRole('CUSTOMER'),
+  uploadReviewImg.single('reviewImage'),
   reviewController.updateReview
 );
 //리뷰삭제
