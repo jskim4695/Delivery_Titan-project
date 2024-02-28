@@ -62,7 +62,7 @@ export class UserService {
     }
   };
 
-  userSignIn = async ({ clientId, email, password }) => {
+  userSignIn = async ({ clientId, email, password, ip, userAgent }) => {
     try {
       let user;
       if (clientId) {
@@ -103,14 +103,14 @@ export class UserService {
 
       // 로그인 성공
       const accessToken = jwt.sign(
-        { userId: user.userId },
+        { userId: user.id, role: user.role },
         process.env.ACCESS_SECRET_KEY,
         {
           expiresIn: '12h',
         }
       );
       const refreshToken = jwt.sign(
-        { userId: user.userId },
+        { userId: user.id, role: user.role, ip, userAgent },
         process.env.REFRESH_SECRET_KEY,
         { expiresIn: '7d' }
       );
@@ -140,12 +140,14 @@ export class UserService {
           nickname: user.nickname,
           email: user.email,
           createdAt: user.createdAt,
+          profileImage: user.profileImage,
         };
       } else if (user.role === 'OWNER') {
         const store = await this.userRepository.getStoreByOwnerId(userId);
         return {
           nickname: user.nickname,
           email: user.email,
+          profileImage: user.profileImage,
           storeName: store.storeName,
           createdAt: store.createdAt,
         };

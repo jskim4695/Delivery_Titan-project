@@ -14,9 +14,9 @@ const userController = new UserController(userService);
 
 router.post('/sign-up', userController.userSignUp);
 router.post('/sign-in', userController.userSignIn);
-router.get('/users/:userId', authenticateUser, userController.getUser);
+router.get('/user/profile', authenticateUser, userController.getUser);
 router.patch(
-  '/users/:userId',
+  '/user/profile',
   authenticateUser,
   uploadProfileImg.single('profileImage'),
   userController.editInfo
