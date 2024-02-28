@@ -19,7 +19,6 @@ export class StoresController {
   createStore = async (req, res, next) => {
     try {
       const requiredFields = [
-        'ownerId',
         'storeName',
         'category',
         'storeIntro',
@@ -38,7 +37,6 @@ export class StoresController {
         );
       }
       const {
-        ownerId,
         storeName,
         category,
         storeIntro,
@@ -48,7 +46,7 @@ export class StoresController {
         shippingFee,
       } = req.body;
 
-      //const ownerId = req.userId;
+      const ownerId = req.userId;
       // 이미지
       const storeImage = req.file.location;
 
@@ -112,7 +110,8 @@ export class StoresController {
   updateStore = async (req, res, next) => {
     try {
       const { storeId } = req.params;
-      //const loginId = req.user.userId;
+      const loginId = req.userId;
+
       const {
         storeName,
         category,
@@ -129,7 +128,7 @@ export class StoresController {
       }
 
       const updatedStore = await this.storesService.updateStore(
-        //loginId,
+        loginId,
         storeId,
         storeName,
         category,
@@ -150,11 +149,11 @@ export class StoresController {
   deleteStore = async (req, res, next) => {
     try {
       const { storeId } = req.params;
-      //const loginId = req.user.userId;
+      const loginId = req.userId;
 
       const deletedStore = await this.storesService.deleteStore(
-        storeId
-        //	loginId,
+        storeId,
+        loginId,
       );
       return res.status(200).json({ data: deletedStore });
     } catch (err) {
