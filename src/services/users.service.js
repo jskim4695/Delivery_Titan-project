@@ -144,13 +144,22 @@ export class UserService {
         };
       } else if (user.role === 'OWNER') {
         const store = await this.userRepository.getStoreByOwnerId(userId);
-        return {
-          nickname: user.nickname,
-          email: user.email,
-          profileImage: user.profileImage,
-          storeName: store.storeName,
-          createdAt: store.createdAt,
-        };
+        if (!store) {
+          return {
+            nickname: user.nickname,
+            email: user.email,
+            profileImage: user.profileImage,
+            storeName: 'store를 등록해주세요.',
+          };
+        } else {
+          return {
+            nickname: user.nickname,
+            email: user.email,
+            profileImage: user.profileImage,
+            storeName: store.storeName,
+            createdAt: store.createdAt,
+          };
+        }
       }
     } catch (err) {
       throw err;
@@ -180,6 +189,10 @@ export class UserService {
         } catch (err) {
           next(err);
         }
+      }
+
+      if (data.password) {
+        data.password = await bcrypt.hash(data.password, 10);
       }
 
       const updatedUser = await this.userRepository.updateUserByUserId(

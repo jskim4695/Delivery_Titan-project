@@ -119,13 +119,6 @@ export class UserController {
       const userId = +req.userId;
       const { password, name, nickname, phone, address, role } = req.body;
 
-      //TODO 나중에 살리기 + 라우터에 미들웨어 추가
-      // if (req.userId !== userId) {
-      //   return res.status(403).json({
-      //     success: false,
-      //     message: '접근 권한이 없습니다.',
-      //   });
-      // }
       const data = {};
 
       if (password || name || nickname || phone || address || role) {

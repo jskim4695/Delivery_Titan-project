@@ -10,31 +10,45 @@ export class CartService {
 
   addToCart = async (storeId, menuId, userId) => {
     const isExistMenu = await this.cartRepository.getMenuById(menuId);
-    if (isExistMenu.storeId != storeId)
+
+    if (!isExistMenu || isExistMenu.storeId != storeId)
       throw new NotFoundError(
         '해당 가게에는 존재하지 않는 메뉴입니다. 다른 메뉴 아이디를 입력해주세요.'
       );
 
     // 사용자의 cart 가져오기(userId로)
-    let cart = await this.cartRepository.getCartByUserId(userId);
-
-    if (!cart) {
+    let carts = await this.cartRepository.getCartsByUserId(userId);
+    let cart = null;
+    if (carts.length == 0) {
+      // 카트가 없다면,
       // 새로 생성
       cart = await this.cartRepository.createCart(storeId, menuId, userId);
-    } else if (cart.storeId != storeId) {
-      // 기존것 삭제 및 새로 생성
+    } else if (carts[0].storeId != storeId) {
+      // 다른 가게에서 메뉴를 담으려고 하면,
+      // 기존 카트 삭제 및 새로 생성
       cart = await this.cartRepository.deleteNcreateCart(
         storeId,
         menuId,
         userId,
-        cart.id
+        carts.map((v) => v.id)
       );
-    } else if (cart.menuId == menuId) {
-      const qty = cart.quantity + 1;
-      cart = await this.cartRepository.updateCart(cart.id, qty);
     } else {
-      cart = await this.cartRepository.createCart(storeId, menuId, userId);
+      // 같은 가게에서 메뉴를 담으려고 하면,
+      for (let i = 0; i < carts.length; i++) {
+        if (carts[i].menuId == menuId) {
+          // 같은 메뉴를 담으려고 하면, 기존 카트의 수량 1증가
+          cart = await this.cartRepository.updateCart(
+            carts[i].id,
+            carts[i].quantity + 1
+          );
+          break;
+        }
+      }
+      // 다른 메뉴를 담으려고 하면, 새로 생성
+      if (!cart)
+        cart = await this.cartRepository.createCart(storeId, menuId, userId);
     }
+
     return cart;
   };
 
@@ -61,10 +75,8 @@ export class CartService {
   getCart = async (userId) => {
     const carts = await this.cartRepository.getCartsByUserId(userId);
     if (carts.length === 0) return carts;
-    const { storeName } = await this.cartRepository.getStoreNameById(
-      carts[0].storeId
-    );
-    carts.storeName = storeName;
+    const { storeName, shippingFee } =
+      await this.cartRepository.getStoreInfoById(carts[0].storeId);
 
     let totalPrice = 0;
     for (let i = 0; i < carts.length; i++) {
@@ -74,8 +86,8 @@ export class CartService {
       carts[i].price = menu.price;
       totalPrice += menu.price * carts[i].quantity;
     }
+    carts.push({ storeName, shippingFee, totalPrice });
 
-    carts.totalPrice = totalPrice;
     return carts;
   };
 

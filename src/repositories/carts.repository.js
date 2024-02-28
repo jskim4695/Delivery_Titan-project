@@ -3,13 +3,6 @@ export class CartRepository {
     this.prisma = prisma;
   }
 
-  getCartByUserId = async (userId) => {
-    const cart = await this.prisma.carts.findFirst({
-      where: { userId: +userId, status: 'AVAILABLE' },
-    });
-    return cart;
-  };
-
   createCart = async (storeId, menuId, userId) => {
     const cart = await this.prisma.carts.create({
       data: {
@@ -22,10 +15,14 @@ export class CartRepository {
     return cart;
   };
 
-  deleteNcreateCart = async (storeId, menuId, userId, cartId) => {
+  deleteNcreateCart = async (storeId, menuId, userId, cartIds) => {
     const cart = await this.prisma.$transaction(async (tx) => {
-      await tx.carts.delete({
-        where: { id: +cartId },
+      await tx.carts.deleteMany({
+        where: {
+          id: {
+            in: cartIds,
+          },
+        },
       });
       const cart = await tx.carts.create({
         data: {
@@ -68,12 +65,12 @@ export class CartRepository {
     return menu;
   };
 
-  getStoreNameById = async (storeId) => {
-    const storeName = await this.prisma.stores.findUnique({
+  getStoreInfoById = async (storeId) => {
+    const storeInfo = await this.prisma.stores.findUnique({
       where: { id: +storeId },
-      select: { storeName: true },
+      select: { storeName: true, shippingFee: true },
     });
-    return storeName;
+    return storeInfo;
   };
 
   deleteCartById = async (cartId) => {
