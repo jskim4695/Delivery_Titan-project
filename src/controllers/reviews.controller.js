@@ -5,10 +5,11 @@ export class ReviewController {
   //리뷰작성
   createReview = async (req, res, next) => {
     try {
-      const { contents, stars, reviewImage } = req.body;
+      const { contents, stars } = req.body;
       const userId = req.userId;
       const orderId = parseInt(req.params.orderId);
 
+      const reviewImage = req.file.location;
       const createReview = await this.reviewService.createReview(
         userId,
         orderId,
@@ -28,9 +29,14 @@ export class ReviewController {
   //리뷰수정
   updateReview = async (req, res, next) => {
     try {
-      const { contents, stars, reviewImage } = req.body;
+      const { contents, stars } = req.body;
       const userId = req.userId;
       const { reviewId } = req.params;
+
+      let reviewImage = undefined;
+      if (req.file) {
+        reviewImage = req.file.location;
+      }
 
       const updateReview = await this.reviewService.updateReview(
         reviewId,

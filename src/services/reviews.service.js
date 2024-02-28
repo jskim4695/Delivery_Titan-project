@@ -2,6 +2,8 @@ import {
   NotFoundError,
   BadRequestError,
 } from '../middlewares/error-handling.middleware.js';
+import { DeleteObjectCommand } from '@aws-sdk/client-s3';
+import { bucketName, s3 } from '../utils/multer/multer.js';
 
 export class ReviewService {
   constructor(reviewRepository) {
@@ -13,7 +15,8 @@ export class ReviewService {
       userId,
       orderId,
       contents,
-      stars,
+      parseInt(stars),
+      // stars,
       reviewImage
     );
     if (stars < 1 || stars > 5)
@@ -38,11 +41,25 @@ export class ReviewService {
       throw new BadRequestError('수정할 내용을 입력해주세요.');
     if (stars < 1 || stars > 5)
       throw new BadRequestError('평점은 1~5점을 입력해주세요.');
+    if (reviewImage != null || reviewImage != undefined) {
+      const imageName = store.reviewImage.split('com/')[1];
+      const deleteCommand = new DeleteObjectCommand({
+        Bucket: bucketName,
+        Key: imageName,
+      });
+      try {
+        await s3.send(deleteCommand);
+      } catch (err) {
+        console.log(err.message);
+      }
+    }
+
     await this.reviewRepository.updateReview(
       reviewId,
       userId,
       contents,
-      stars,
+      parseInt(stars),
+      // stars,
       reviewImage
     );
     const updateReview = await this.reviewRepository.getReview(reviewId);
@@ -51,6 +68,17 @@ export class ReviewService {
 
   //리뷰 삭제
   deleteReview = async (userId, reviewId) => {
+    const imageName = store.reviewImage.split('com/')[1];
+    const deleteCommand = new DeleteObjectCommand({
+      Bucket: bucketName,
+      Key: imageName,
+    });
+    try {
+      await s3.send(deleteCommand);
+    } catch (err) {
+      next(err);
+    }
+
     const deleteReview = await this.reviewRepository.deleteReview(
       userId,
       reviewId
