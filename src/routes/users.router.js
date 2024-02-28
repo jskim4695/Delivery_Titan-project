@@ -4,6 +4,7 @@ import { authenticateUser } from '../middlewares/auth.middleware.js';
 import { UserController } from '../controllers/users.controller.js';
 import { UserService } from '../services/users.service.js';
 import { UserRepository } from '../repositories/users.repository.js';
+import { uploadProfileImg } from '../utils/multer/multer.js';
 
 const router = express.Router();
 
@@ -13,7 +14,12 @@ const userController = new UserController(userService);
 
 router.post('/sign-up', userController.userSignUp);
 router.post('/sign-in', userController.userSignIn);
-router.get('/users/:userId', userController.getUser);
-router.patch('/users/:userId', userController.editInfo);
+router.get('/users/:userId', authenticateUser, userController.getUser);
+router.patch(
+  '/users/:userId',
+  authenticateUser,
+  uploadProfileImg.single('profileImage'),
+  userController.editInfo
+);
 
 export default router;

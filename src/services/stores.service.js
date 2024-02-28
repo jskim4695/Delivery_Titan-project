@@ -1,4 +1,6 @@
 import { ApiError } from '../middlewares/error-handling.middleware.js';
+import { DeleteObjectCommand } from '@aws-sdk/client-s3';
+import { bucketName, s3 } from '../utils/multer/multer.js';
 
 export class StoresService {
   constructor(storesRepository) {
@@ -166,6 +168,20 @@ export class StoresService {
     // 	throw new ApiError(403, `본인의 업장 정보만 수정 가능합니다.`);
     // }
 
+    // storeImage를 업데이트 하려고 한다면, s3에서 기존 이미지 삭제
+    if (storeImage != null || storeImage != undefined) {
+      const imageName = store.storeImage.split('com/')[1];
+      const deleteCommand = new DeleteObjectCommand({
+        Bucket: bucketName,
+        Key: imageName,
+      });
+      try {
+        await s3.send(deleteCommand);
+      } catch (err) {
+        next(err);
+      }
+    }
+
     await this.storesRepository.updateStore(
       storeId,
       storeName,
@@ -191,6 +207,18 @@ export class StoresService {
     // if (store.ownerId != loginId) {
     // 	throw new ApiError(403, `본인 소유의 업장만 삭제 가능합니다.`);
     // }
+
+    // s3 버킷에서 이미지 삭제
+    const imageName = store.storeImage.split('com/')[1];
+    const deleteCommand = new DeleteObjectCommand({
+      Bucket: bucketName,
+      Key: imageName,
+    });
+    try {
+      await s3.send(deleteCommand);
+    } catch (err) {
+      next(err);
+    }
 
     await this.storesRepository.deleteStore(storeId);
 

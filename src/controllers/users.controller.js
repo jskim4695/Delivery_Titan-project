@@ -115,8 +115,7 @@ export class UserController {
   editInfo = async (req, res) => {
     try {
       const userId = req.params.userId;
-      const { password, name, nickname, phone, address, role, profileImg } =
-        req.body;
+      const { password, name, nickname, phone, address, role } = req.body;
 
       //TODO 나중에 살리기 + 라우터에 미들웨어 추가
       // if (req.userId !== userId) {
@@ -127,23 +126,17 @@ export class UserController {
       // }
       const data = {};
 
-      if (
-        password ||
-        name ||
-        nickname ||
-        phone ||
-        address ||
-        role ||
-        profileImg
-      ) {
+      if (password || name || nickname || phone || address || role) {
         data.password = password;
         data.name = name;
         data.nickname = nickname;
         data.phone = phone;
         data.address = address;
         data.role = role;
-        data.profileImg = profileImg;
       }
+
+      // 이미지 부분 추가했어요~~
+      if (req.file) data.profileImage = req.file.location;
 
       await this.userService.updateUser(userId, data);
 

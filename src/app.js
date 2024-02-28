@@ -10,6 +10,7 @@ import ReviewsRouter from './routes/reviews.router.js';
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
 import { sessionOption } from './utils/redis/redis.js';
+import { errorHandler } from './middlewares/error-handling.middleware.js';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -30,6 +31,8 @@ app.use('/', [
   MainRouter,
   ReviewsRouter,
 ]);
+app.use(errorHandler);
+
 app.listen(PORT, () => {
   console.log(PORT, '포트로 서버가 열렸어요!');
 });

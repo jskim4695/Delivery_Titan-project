@@ -25,6 +25,7 @@ export class MenuController {
     try {
       const requiredFields = ['storeId', 'menuName', 'menuInfo', 'price'];
       const missingFields = requiredFields.filter((field) => !req.body[field]);
+      if (!req.file) missingFields.push('menuImage');
 
       if (missingFields.length > 0) {
         throw new ApiError(
@@ -32,7 +33,10 @@ export class MenuController {
           `필수 필드가 누락되었습니다: ${missingFields.join(', ')}`
         );
       }
-      const { storeId, menuName, menuInfo, menuImage, price } = req.body;
+      const { storeId, menuName, menuInfo, price } = req.body;
+
+      // 이미지 부분 추가
+      const menuImage = req.file.location;
 
       const createdMenu = await this.menuService.createMenu(
         storeId,
@@ -73,7 +77,8 @@ export class MenuController {
     try {
       const { menuId } = req.params;
       //const loginId = req.user.userId;
-      const { menuName, menuInfo, menuImage, price } = req.body;
+      const { menuName, menuInfo, price } = req.body;
+      const menuImage = req.file.location;
 
       if (!menuId) {
         throw new ApiError(404, `메뉴 아이디를 받아오지 못했습니다.`);
@@ -104,6 +109,7 @@ export class MenuController {
         menuId
         //	loginId,
       );
+
       return res.status(200).json({ data: deletedMenu });
     } catch (err) {
       next(err);

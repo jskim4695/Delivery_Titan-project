@@ -1,5 +1,7 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
+import { DeleteObjectCommand } from '@aws-sdk/client-s3';
+import { bucketName, s3 } from '../utils/multer/multer.js';
 
 export class UserService {
   constructor(userRepository) {
@@ -162,6 +164,20 @@ export class UserService {
           code: 401,
           message: '사용자를 찾을 수 없습니다.',
         };
+      }
+
+      // 만약 프로필 사진이 이미 있다면, s3에서 기존 이미지 삭제
+      if (user.profileImage) {
+        const imageName = user.profileImage.split('com/')[1];
+        const deleteCommand = new DeleteObjectCommand({
+          Bucket: bucketName,
+          Key: imageName,
+        });
+        try {
+          await s3.send(deleteCommand);
+        } catch (err) {
+          next(err);
+        }
       }
 
       const updatedUser = await this.userRepository.updateUserByUserId(
