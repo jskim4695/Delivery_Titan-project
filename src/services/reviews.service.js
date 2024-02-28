@@ -4,7 +4,7 @@ export class ReviewService {
   }
   // 리뷰작성
   createReview = async (userId, orderId, contents, stars, reviewImage) => {
-    const createReview = await this.reviewRepository.createdReview(
+    const createReview = await this.reviewRepository.createReview(
       userId,
       orderId,
       contents,
@@ -68,7 +68,7 @@ export class ReviewService {
   };
   //리뷰 조회 업자
   getReviewByStoreId = async (storeId) => {
-    const getReview = await this.reviewRepository.getReview(storeId);
+    const getReview = await this.reviewRepository.getReviewByStoreId(storeId);
     if (!getReview) {
       throw new Error('리뷰가 없습니다.');
     }

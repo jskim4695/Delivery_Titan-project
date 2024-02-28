@@ -37,13 +37,13 @@ export class ReviewController {
       const { contents, stars, reviewImage } = req.body;
       const { userId } = req.user;
       const { reviewId } = req.params;
-      if ((!contents, !stars, !reviewImage, !reviewId)) {
+      if (!contents || !stars || !reviewImage || !reviewId) {
         return res.status(400).json({
           message: '수정 데이터를 확인해주세요.',
         });
       }
       if (stars < 1 || stars > 5) {
-        throw new Error(400, '평점은 1~5점 입니다.');
+        throw new Error('평점은 1~5점 입니다.');
       }
       const updateReview = await this.reviewService.updateReview(
         reviewId,

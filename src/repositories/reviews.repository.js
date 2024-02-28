@@ -31,8 +31,6 @@ export class ReviewRepository {
       },
       data: {
         userId,
-        storeId,
-        orderId,
         contents,
         stars,
         reviewImage,
@@ -52,13 +50,13 @@ export class ReviewRepository {
     const getReview = await this.prisma.reviews.findMany({
       where: { userId: +userId },
       select: {
-        reviewId,
-        storeId,
-        contents,
-        stars,
-        reviewImage,
-        createdAt,
-        updatedAt,
+        reviewId: true,
+        storeId: true,
+        contents: true,
+        stars: true,
+        reviewImage: true,
+        createdAt: true,
+        updatedAt: true,
       },
     });
     return getReview;
@@ -69,13 +67,13 @@ export class ReviewRepository {
     const getReview = await this.prisma.reviewId.findMany({
       where: { storeId: +storeId },
       select: {
-        reviewId,
-        userId,
-        contents,
-        stars,
-        reviewImage,
-        createdAt,
-        updatedAt,
+        reviewId: true,
+        userId: true,
+        contents: true,
+        stars: true,
+        reviewImage: true,
+        createdAt: true,
+        updatedAt: true,
       },
     });
     return getReview;
