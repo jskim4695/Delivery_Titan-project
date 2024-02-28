@@ -1,4 +1,6 @@
 node_modules
 # Keep environment variables out of version control
 .env
-test
+# __tests__/unit/controllers/users.controller.unit.spec.js
+# __tests__/unit/services/users.service.unit.spec.js
+.gitignore
