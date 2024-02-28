@@ -1,6 +1,6 @@
 import { beforeEach, jest } from '@jest/globals';
-import { StoresController } from '../../src/controllers/stores.controller';
-import { ApiError } from '../../src/middlewares/error-handling.middleware';
+import { StoresController } from '../../../src/controllers/stores.controller';
+import { ApiError } from '../../../src/middlewares/error-handling.middleware';
 
 const mockStoresService = {
 	findAllStores: jest.fn(),
