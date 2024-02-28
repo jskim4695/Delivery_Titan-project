@@ -1,3 +1,5 @@
+import { NotFoundError } from '../middlewares/error-handling.middleware.js';
+
 export class ReviewRepository {
   constructor(prisma, orderRepository) {
     this.prisma = prisma;
@@ -6,9 +8,8 @@ export class ReviewRepository {
 
   createReview = async (userId, orderId, contents, stars, reviewImage) => {
     const order = await this.orderRepository.getOrderById(orderId);
-    if (!order) {
-      throw new Error('주문을 찾을수 없습니다.');
-    }
+    if (!order) throw new NotFoundError('orderId을 찾을수 없습니다.');
+
     const storeId = order.storeId;
 
     const createReview = await this.prisma.reviews.create({
@@ -16,18 +17,27 @@ export class ReviewRepository {
         userId,
         storeId,
         orderId,
-        contents,
         stars,
         reviewImage,
+        contents,
       },
     });
     return createReview;
   };
 
   updateReview = async (reviewId, userId, contents, stars, reviewImage) => {
+    const existingReview = await this.prisma.reviews.findUnique({
+      where: {
+        id: +reviewId,
+      },
+    });
+    if (!existingReview) {
+      throw new NotFoundError('reviewId를 찾을 수 없습니다.');
+    }
+
     const updateReview = await this.prisma.reviews.update({
       where: {
-        reviewId: +reviewId,
+        id: +reviewId,
       },
       data: {
         userId,
@@ -40,8 +50,16 @@ export class ReviewRepository {
   };
 
   deleteReview = async (userId, reviewId) => {
+    const existingReview = await this.prisma.reviews.findUnique({
+      where: {
+        id: +reviewId,
+      },
+    });
+    if (!existingReview)
+      throw new NotFoundError('reviewId를 찾을 수 없습니다.');
+
     const deleteReview = await this.prisma.reviews.delete({
-      where: { reviewId: +reviewId, userId: +userId },
+      where: { id: +reviewId, userId: +userId },
     });
     return deleteReview;
   };
@@ -50,7 +68,7 @@ export class ReviewRepository {
     const getReview = await this.prisma.reviews.findMany({
       where: { userId: +userId },
       select: {
-        reviewId: true,
+        id: true,
         storeId: true,
         contents: true,
         stars: true,
@@ -59,15 +77,18 @@ export class ReviewRepository {
         updatedAt: true,
       },
     });
+
     return getReview;
   };
 
   //가게 리뷰 조회
   getReviewByStoreId = async (storeId) => {
-    const getReview = await this.prisma.reviewId.findMany({
+    if (!storeId) throw new NotFoundError('storeId를 찾을 수 없습니다.');
+
+    const getReview = await this.prisma.reviews.findMany({
       where: { storeId: +storeId },
       select: {
-        reviewId: true,
+        id: true,
         userId: true,
         contents: true,
         stars: true,
