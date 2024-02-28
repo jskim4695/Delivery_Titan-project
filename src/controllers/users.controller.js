@@ -85,14 +85,8 @@ export class UserController {
         password,
       });
 
-      res.cookie('accessToken', token.accessToken, {
-        maxAge: 12 * 60 * 60 * 1000,
-        httpOnly: true,
-      });
-      res.cookie('refreshToken', token.refreshToken, {
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-        httpOnly: true,
-      });
+      req.session.accessToken = token.accessToken;
+      req.session.refreshToken = token.refreshToken;
 
       return res.json(token);
     } catch (err) {
