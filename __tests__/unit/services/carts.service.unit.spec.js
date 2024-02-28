@@ -13,7 +13,7 @@ let cartRepository = {
   getCartByUserIdNMenuId: jest.fn(),
   getCartsByUserId: jest.fn(),
   getMenuById: jest.fn(),
-  getStoreNameById: jest.fn(),
+  getStoreInfoById: jest.fn(),
   deleteCartById: jest.fn(),
 };
 
@@ -291,25 +291,27 @@ describe('Cart Service Unit Test', () => {
         updatedAt: '2024-02-20T06:50:42.129Z',
       },
     ];
-    const sampleStoreName = {
+    const sampleStoreInfo = {
       storeName: 'Lee Chicken',
+      shippingFee: 3000,
     };
     const sampleMenu = [
       { menuName: 'menu1', menuImage: 'menu1.jpg', price: 10000 },
       { menuName: 'menu2', menuImage: 'menu2.jpg', price: 15000 },
     ];
     cartRepository.getCartsByUserId.mockResolvedValue(sampleCarts);
-    cartRepository.getStoreNameById.mockResolvedValue(sampleStoreName);
+    cartRepository.getStoreInfoById.mockResolvedValue(sampleStoreInfo);
     cartRepository.getMenuById
       .mockResolvedValueOnce(sampleMenu[0])
       .mockResolvedValueOnce(sampleMenu[1]);
 
     const result = await cartService.getCart(userId);
 
-    expect(result.storeName).toEqual(sampleStoreName.storeName);
-    expect(result.totalPrice).toEqual(25000);
     expect(result[0].menuName).toEqual(sampleMenu[0].menuName);
     expect(result[1].menuName).toEqual(sampleMenu[1].menuName);
+    expect(result[2].storeName).toEqual(sampleStoreInfo.storeName);
+    expect(result[2].totalPrice).toEqual(25000);
+    expect(result[2].shippingFee).toEqual(3000);
   });
 
   test('deleteMenu 테스트 by NotFoundError', async () => {
