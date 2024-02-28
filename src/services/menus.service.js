@@ -43,12 +43,15 @@ export class MenuService {
    * @param {*} menuIntro
    * @returns
    */
-  createMenu = async (storeId, menuName, menuInfo, menuImage, price) => {
+  createMenu = async (loginId, storeId, menuName, menuInfo, menuImage, price) => {
     const existingStore = await this.storesRepository.findStoreById(storeId);
-    console.log(storeId);
 
     if (!existingStore) {
       throw new ApiError(404, `해당 업장이 존재하지 않습니다.`);
+    }
+
+    if (existingStore.ownerId != loginId) {
+    	throw new ApiError(403, `본인의 업장에서만 메뉴 등록이 가능합니다.`);
     }
 
     const createdMenu = await this.menuRepository.createMenu(
@@ -90,16 +93,16 @@ export class MenuService {
     };
   };
 
-  updateMenu = async (menuId, menuName, menuInfo, menuImage, price) => {
+  updateMenu = async (loginId, menuId, menuName, menuInfo, menuImage, price) => {
     const menu = await this.menuRepository.findMenuById(menuId);
 
     if (!menu) {
       throw new ApiError(404, `해당 메뉴 정보가 없습니다.`);
     }
 
-    // if (menu.ownerId != loginId) {
-    // 	throw new ApiError(403, `본인의 업장 정보만 수정 가능합니다.`);
-    // }
+    if (menu.store.ownerId != loginId) {
+    	throw new ApiError(403, `본인의 업장 메뉴만 수정 가능합니다.`);
+    }
 
     // menuImage를 업데이트 하려고 한다면, s3에서 기존 것 삭제
     if (menuImage != null || menuImage != undefined) {
@@ -133,9 +136,9 @@ export class MenuService {
     if (!menu) {
       throw new ApiError(404, `존재하지 않는 메뉴입니다.`);
     }
-    // if (menu.ownerId != loginId) {
-    // 	throw new ApiError(403, `본인 소유의 업장만 삭제 가능합니다.`);
-    // }
+    if (menu.ownerId != loginId) {
+    	throw new ApiError(403, `본인 소유의 업장에서만 메뉴 삭제가 가능합니다.`);
+    }
 
     await this.menuRepository.deleteMenu(menuId);
 

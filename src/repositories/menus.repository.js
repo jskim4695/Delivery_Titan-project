@@ -20,6 +20,7 @@ export class MenuRepository {
         store: {
           select: {
             storeName: true,
+            ownerId : true,
           },
         },
       },
@@ -56,6 +57,7 @@ export class MenuRepository {
         store: {
           select: {
             storeName: true,
+            ownerId: true,
           },
         },
       },

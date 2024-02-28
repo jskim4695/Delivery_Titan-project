@@ -24,6 +24,7 @@ export class MenuController {
   createMenu = async (req, res, next) => {
     try {
       const requiredFields = ['storeId', 'menuName', 'menuInfo', 'price'];
+      const loginId = req.userId;
       const missingFields = requiredFields.filter((field) => !req.body[field]);
       if (!req.file) missingFields.push('menuImage');
 
@@ -39,6 +40,7 @@ export class MenuController {
       const menuImage = req.file.location;
 
       const createdMenu = await this.menuService.createMenu(
+        loginId,
         storeId,
         menuName,
         menuInfo,
@@ -76,16 +78,19 @@ export class MenuController {
   updateMenu = async (req, res, next) => {
     try {
       const { menuId } = req.params;
-      //const loginId = req.user.userId;
+      const loginId = req.userId;
       const { menuName, menuInfo, price } = req.body;
-      const menuImage = req.file.location;
+      let menuImage = undefined;
+      if (req.file) {
+        menuImage = req.file.location;
+      }
 
       if (!menuId) {
         throw new ApiError(404, `메뉴 아이디를 받아오지 못했습니다.`);
       }
 
       const updatedMenu = await this.menuService.updateMenu(
-        //loginId,
+        loginId,
         menuId,
         menuName,
         menuInfo,
