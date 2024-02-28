@@ -83,9 +83,11 @@ export class UserController {
         clientId,
         email,
         password,
+        ip: req.ip,
+        userAgent: req.headers['user-agent'],
       });
 
-      req.session.accessToken = token.accessToken;
+      res.cookie('accessToken', token.accessToken);
       req.session.refreshToken = token.refreshToken;
 
       return res.json(token);
@@ -96,7 +98,7 @@ export class UserController {
 
   getUser = async (req, res) => {
     try {
-      const { userId } = req.params;
+      const userId = +req.userId;
       const user = await this.userService.getUserById(userId);
 
       if (!user) {
@@ -114,7 +116,7 @@ export class UserController {
 
   editInfo = async (req, res) => {
     try {
-      const userId = req.params.userId;
+      const userId = +req.userId;
       const { password, name, nickname, phone, address, role } = req.body;
 
       //TODO 나중에 살리기 + 라우터에 미들웨어 추가
