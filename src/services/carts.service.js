@@ -1,3 +1,8 @@
+import {
+  NotFoundError,
+  BadRequestError,
+} from '../middlewares/error-handling.middleware';
+
 export class CartService {
   constructor(cartRepository) {
     this.cartRepository = cartRepository;
@@ -6,7 +11,7 @@ export class CartService {
   addToCart = async (storeId, menuId, userId) => {
     const isExistMenu = await this.cartRepository.getMenuById(menuId);
     if (isExistMenu.storeId != storeId)
-      throw new Error(
+      throw new NotFoundError(
         '해당 가게에는 존재하지 않는 메뉴입니다. 다른 메뉴 아이디를 입력해주세요.'
       );
 
@@ -35,16 +40,18 @@ export class CartService {
 
   updateQuantity = async (storeId, menuId, userId, quantity) => {
     if (quantity == undefined || quantity == null)
-      throw new Error('변경하시려는 quantity를 입력해주세요.');
+      throw new BadRequestError('변경하시려는 quantity를 입력해주세요.');
 
     const isExistCart = await this.cartRepository.getCartByUserIdNMenuId(
       userId,
       menuId
     );
 
-    if (!isExistCart) throw new Error('카트에 존재하지 않는 메뉴입니다');
+    if (!isExistCart)
+      throw new NotFoundError('카트에 존재하지 않는 메뉴입니다');
 
-    if (isExistCart.storeId != storeId) throw new Error('잘못된 파라미터');
+    if (isExistCart.storeId != storeId)
+      throw new BadRequestError('잘못된 파라미터');
 
     const cart = await this.cartRepository.updateCart(isExistCart.id, quantity);
     return cart;
@@ -77,7 +84,8 @@ export class CartService {
       userId,
       menuId
     );
-    if (!isExistCart) throw new Error('카트에 존재하지 않는 메뉴입니다');
+    if (!isExistCart)
+      throw new NotFoundError('카트에 존재하지 않는 메뉴입니다');
 
     await this.cartRepository.deleteCartById(isExistCart.id);
     return;
