@@ -6,6 +6,7 @@ import { StoresService } from '../services/stores.service.js';
 import { StoresController } from '../controllers/stores.controller.js';
 import { uploadStoreImg } from '../utils/multer/multer.js';
 import { authenticateUser } from '../middlewares/auth.middleware.js';
+import { checkRole } from '../middlewares/auth-role.middleware.js';
 
 const router = express.Router();
 
@@ -20,6 +21,7 @@ const storesController = new StoresController(storesService);
 router.post(
   '/store',
   authenticateUser,
+  checkRole('OWNER'),
   uploadStoreImg.single('storeImage'),
   storesController.createStore
 );
@@ -39,6 +41,7 @@ router.get('/store/:storeId', storesController.getStoreById);
 router.patch(
   '/store/:storeId',
   authenticateUser,
+  checkRole('OWNER'),
   uploadStoreImg.single('storeImage'),
   storesController.updateStore
 );
@@ -49,6 +52,7 @@ router.patch(
 router.delete(
   '/store/:storeId',
   authenticateUser,
+  checkRole('OWNER'),
   storesController.deleteStore
 );
 

@@ -48,6 +48,7 @@ export class StoresController {
         shippingFee,
       } = req.body;
 
+      //const ownerId = req.userId;
       // 이미지
       const storeImage = req.file.location;
 
@@ -122,7 +123,10 @@ export class StoresController {
         shippingFee,
       } = req.body;
 
-      const storeImage = req.file.location;
+      let storeImage = undefined;
+      if (req.file) {
+        storeImage = req.file.location;
+      }
 
       const updatedStore = await this.storesService.updateStore(
         //loginId,

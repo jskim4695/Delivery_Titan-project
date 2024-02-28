@@ -178,7 +178,7 @@ export class StoresService {
       try {
         await s3.send(deleteCommand);
       } catch (err) {
-        next(err);
+        console.log(err.message);
       }
     }
 

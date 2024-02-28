@@ -51,7 +51,7 @@ export class StoresRepository {
   ) => {
     const createdStore = await this.prisma.stores.create({
       data: {
-        ownerId,
+        ownerId: +ownerId,
         storeName,
         category,
         storeImage,
@@ -59,7 +59,7 @@ export class StoresRepository {
         status,
         storeAddress,
         storePhone,
-        shippingFee,
+        shippingFee: +shippingFee,
       },
     });
 
