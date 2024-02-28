@@ -22,7 +22,6 @@ export class StoresController {
         'ownerId',
         'storeName',
         'category',
-        'storeImage',
         'storeIntro',
         'status',
         'storeAddress',
@@ -30,6 +29,7 @@ export class StoresController {
         'shippingFee',
       ];
       const missingFields = requiredFields.filter((field) => !req.body[field]);
+      if (!req.file) missingFields.push('storeImage');
 
       if (missingFields.length > 0) {
         throw new ApiError(
@@ -41,13 +41,15 @@ export class StoresController {
         ownerId,
         storeName,
         category,
-        storeImage,
         storeIntro,
         status,
         storeAddress,
         storePhone,
         shippingFee,
       } = req.body;
+
+      // 이미지
+      const storeImage = req.file.location;
 
       const createdStore = await this.storesService.createStore(
         ownerId,
@@ -113,13 +115,14 @@ export class StoresController {
       const {
         storeName,
         category,
-        storeImage,
         storeIntro,
         status,
         storeAddress,
         storePhone,
         shippingFee,
       } = req.body;
+
+      const storeImage = req.file.location;
 
       const updatedStore = await this.storesService.updateStore(
         //loginId,

@@ -1,4 +1,6 @@
 import { ApiError } from '../middlewares/error-handling.middleware.js';
+import { DeleteObjectCommand } from '@aws-sdk/client-s3';
+import { bucketName, s3 } from '../utils/multer/multer.js';
 
 export class MenuService {
   constructor(menuRepository, storesRepository) {
@@ -99,6 +101,20 @@ export class MenuService {
     // 	throw new ApiError(403, `본인의 업장 정보만 수정 가능합니다.`);
     // }
 
+    // menuImage를 업데이트 하려고 한다면, s3에서 기존 것 삭제
+    if (menuImage != null || menuImage != undefined) {
+      const imageName = menu.menuImage.split('com/')[1];
+      const deleteCommand = new DeleteObjectCommand({
+        Bucket: bucketName,
+        Key: imageName,
+      });
+      try {
+        await s3.send(deleteCommand);
+      } catch (err) {
+        next(err);
+      }
+    }
+
     await this.menuRepository.updateMenu(
       menuId,
       menuName,
@@ -123,6 +139,17 @@ export class MenuService {
 
     await this.menuRepository.deleteMenu(menuId);
 
+    // s3 버킷에서 이미지 삭제
+    const imageName = menu.menuImage.split('com/')[1];
+    const deleteCommand = new DeleteObjectCommand({
+      Bucket: bucketName,
+      Key: imageName,
+    });
+    try {
+      await s3.send(deleteCommand);
+    } catch (err) {
+      next(err);
+    }
     return {
       message: '정상 삭제되었습니다.',
     };
