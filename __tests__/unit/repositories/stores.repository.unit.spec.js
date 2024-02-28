@@ -1,5 +1,5 @@
 import { jest } from '@jest/globals';
-import { StoresRepository } from '../../src/repositories/stores.repository.js';
+import { StoresRepository } from '../../../src/repositories/stores.repository.js';
 
 let mockPrisma = {
   stores: {
