@@ -148,6 +148,7 @@ export class StoresService {
   };
 
   updateStore = async (
+    loginId,
     storeId,
     storeName,
     category,
@@ -164,9 +165,10 @@ export class StoresService {
       throw new ApiError(404, `해당 업장 정보가 없습니다.`);
     }
 
-    // if (store.ownerId != loginId) {
-    // 	throw new ApiError(403, `본인의 업장 정보만 수정 가능합니다.`);
-    // }
+
+    if (store.ownerId != loginId) {
+    	throw new ApiError(403, `본인의 업장 정보만 수정 가능합니다.`);
+    }
 
     // storeImage를 업데이트 하려고 한다면, s3에서 기존 이미지 삭제
     if (storeImage != null || storeImage != undefined) {
@@ -204,9 +206,9 @@ export class StoresService {
     if (!store) {
       throw new ApiError(404, `존재하지 않는 업장입니다.`);
     }
-    // if (store.ownerId != loginId) {
-    // 	throw new ApiError(403, `본인 소유의 업장만 삭제 가능합니다.`);
-    // }
+    if (store.ownerId != loginId) {
+    	throw new ApiError(403, `본인 소유의 업장만 삭제 가능합니다.`);
+    }
 
     // s3 버킷에서 이미지 삭제
     const imageName = store.storeImage.split('com/')[1];
