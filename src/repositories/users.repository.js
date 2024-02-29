@@ -16,15 +16,6 @@ export class UserRepository {
     return user; // 그 데이터를 반환
   };
 
-  selectOneUserByClientId = async (clientId) => {
-    const user = await prisma.users.findFirst({
-      where: {
-        clientId,
-      },
-    });
-    return user;
-  };
-
   selectOneUserByEmail = async (email) => {
     const user = await prisma.users.findFirst({
       where: {
