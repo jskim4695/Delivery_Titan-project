@@ -37,4 +37,14 @@ export class MainController {
       next(err);
     }
   };
+
+  /** 메인 페이지에서 매출액 랭킹 보기 */
+  getStoreRanking = async (req, res, next) => {
+    try {
+      const ranking = await this.mainService.getStoreRanking();
+      return res.status(200).json({ ranking });
+    } catch (err) {
+      next(err);
+    }
+  };
 }

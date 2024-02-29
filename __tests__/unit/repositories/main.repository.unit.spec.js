@@ -142,4 +142,30 @@ describe('Main Repository Unit Test', () => {
       },
     });
   });
+
+  test('getStoresNOrders 테스트 (정상)', async () => {
+    const sampleStores = [
+      {
+        id: 1,
+        ownerId: 2,
+        storeName: 'bhc chicken',
+        category: 'CHICKEN',
+        storeImage: 'ppuringkle.jpg',
+        storeIntro: 'tasty~~',
+        storeRate: 4.5,
+        orderCount: 3,
+        status: 'AVAILABLE',
+        storeAddress: 'Seoul',
+        storePhone: '01000000000',
+        createdAt: '2024-02-27T03:08:04.175Z',
+        updatedAt: '2024-02-29T02:11:45.494Z',
+        shippingFee: 3000,
+        orders: [
+          { id: 1, totalPrice: 32000 },
+          { id: 2, totalPrice: 24500 },
+          { id: 3, totalPrice: 23000 },
+        ],
+      },
+    ];
+  });
 });

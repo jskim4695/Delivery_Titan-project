@@ -10,7 +10,10 @@ let mainRepository = {
   getStoreInfoById: jest.fn(),
   getAllStores: jest.fn(),
   getSortedStores: jest.fn(),
+  getStoresNOrders: jest.fn(),
 };
+
+const reduce = jest.fn();
 
 let mainService = new MainService(mainRepository);
 
@@ -94,7 +97,7 @@ describe('Main Service Unit Test', () => {
         id: 4,
       },
     ];
-    console.log('어리너링너ㅣ린어');
+
     mainRepository.getAllStores.mockResolvedValue(sampleStores);
 
     const result = await mainService.getAllStores();
@@ -166,5 +169,90 @@ describe('Main Service Unit Test', () => {
       orderKey,
       orderValue
     );
+  });
+
+  test('getStoreRanking 테스트 (정상)', async () => {
+    const sampleStores = [
+      {
+        id: 1,
+        ownerId: 2,
+        storeName: 'bhc chicken',
+        category: 'CHICKEN',
+        storeImage: 'ppuringkle.jpg',
+        storeIntro: 'tasty~~',
+        storeRate: 4.5,
+        orderCount: 3,
+        status: 'AVAILABLE',
+        storeAddress: 'Seoul',
+        storePhone: '01000000000',
+        createdAt: '2024-02-27T03:08:04.175Z',
+        updatedAt: '2024-02-29T02:11:45.494Z',
+        shippingFee: 3000,
+        orders: [
+          { id: 1, totalPrice: 32000 },
+          { id: 2, totalPrice: 24500 },
+          { id: 3, totalPrice: 23000 },
+        ],
+      },
+      {
+        id: 2,
+        ownerId: 4,
+        storeName: 'Sparkle Pizza',
+        category: 'PIZZA',
+        storeImage: 'sparkle.jpg',
+        storeIntro: 'very good yum yum~~',
+        storeRate: 4.4,
+        orderCount: 2,
+        status: 'AVAILABLE',
+        storeAddress: 'Seoul',
+        storePhone: '01011111111',
+        createdAt: '2024-02-27T03:08:04.175Z',
+        updatedAt: '2024-02-29T02:11:45.494Z',
+        shippingFee: 2000,
+        orders: [
+          { id: 4, totalPrice: 30000 },
+          { id: 5, totalPrice: 20000 },
+        ],
+      },
+    ];
+
+    const sampleRanking = [
+      {
+        id: 1,
+        ownerId: 2,
+        storeName: 'bhc chicken',
+        category: 'CHICKEN',
+        storeImage: 'ppuringkle.jpg',
+        storeRate: 4.5,
+        orderCount: 3,
+        status: 'AVAILABLE',
+        sales: 79500,
+      },
+      {
+        id: 2,
+        ownerId: 4,
+        storeName: 'Sparkle Pizza',
+        category: 'PIZZA',
+        storeImage: 'sparkle.jpg',
+        storeRate: 4.4,
+        orderCount: 2,
+        status: 'AVAILABLE',
+        sales: 50000,
+      },
+    ];
+
+    mainRepository.getStoresNOrders.mockResolvedValue(sampleStores);
+    reduce
+      .mockReturnValueOnce(32000)
+      .mockReturnValueOnce(24500)
+      .mockReturnValueOnce(23000)
+      .mockReturnValueOnce(30000)
+      .mockReturnValueOnce(20000);
+
+    const result = await mainService.getStoreRanking();
+
+    expect(result).toEqual(sampleRanking);
+    expect(mainRepository.getStoresNOrders).toHaveBeenCalledTimes(1);
+    expect(mainRepository.getStoresNOrders).toHaveBeenCalledWith();
   });
 });
