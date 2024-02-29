@@ -93,13 +93,13 @@ describe('Order Repository Unit Test', () => {
     },
   ];
 
-  test('createOrder 테스트 (정상)', async () => {
+  test('createOrderByCart 테스트 (정상)', async () => {
     const userId = 1;
     const address = 'Seoul Seongworgokdong 21';
 
     prisma.$transaction.mockResolvedValue(sampleOrder);
 
-    const result = await orderRepository.createOrder(
+    const result = await orderRepository.createOrderByCart(
       sampleCarts,
       userId,
       address
@@ -109,14 +109,14 @@ describe('Order Repository Unit Test', () => {
     expect(prisma.$transaction).toHaveBeenCalled();
   });
 
-  test('createOrder 테스트 (transaction 실패)', async () => {
+  test('createOrderByCart 테스트 (transaction 실패)', async () => {
     const userId = 1;
     const address = 'Seoul Seongworgokdong 21';
     const mockError = new Error('transaction 실패');
     prisma.$transaction.mockRejectedValue(mockError);
 
     await expect(
-      orderRepository.createOrder(sampleCarts, userId, address)
+      orderRepository.createOrderByCart(sampleCarts, userId, address)
     ).rejects.toThrow(mockError);
   });
 
@@ -220,5 +220,24 @@ describe('Order Repository Unit Test', () => {
     const result = await orderRepository.updateStatus(orderId, status);
 
     expect(result).toEqual(resultOrder);
+  });
+
+  test('createOrderByMenu 테스트 (정상)', async () => {
+    const userId = 1;
+    const storeId = 1;
+    const totalPrice = 34000;
+    const address = 'Seoul Seongworgokdong 21';
+
+    prisma.$transaction.mockResolvedValue(sampleOrder);
+
+    const result = await orderRepository.createOrderByMenu(
+      userId,
+      storeId,
+      totalPrice,
+      address
+    );
+
+    expect(result).toEqual(sampleOrder);
+    expect(prisma.$transaction).toHaveBeenCalled();
   });
 });

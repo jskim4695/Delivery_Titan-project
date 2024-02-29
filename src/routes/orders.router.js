@@ -19,7 +19,7 @@ router.post(
   '/user/cart/order',
   authenticateUser,
   checkRole('CUSTOMER'),
-  orderController.createOrder
+  orderController.createOrderByCart
 );
 
 /** 주문 확인하기(고객, 사장) */
@@ -31,6 +31,14 @@ router.patch(
   authenticateUser,
   checkRole('OWNER'),
   orderController.updateStatus
+);
+
+/** 메뉴로 주문하기(고객) */
+router.post(
+  '/menu/:menuId/order',
+  authenticateUser,
+  checkRole('CUSTOMER'),
+  orderController.createOrderByMenu
 );
 
 export default router;

@@ -10,7 +10,7 @@ export class OrderService {
     this.cartRepository = cartRepository;
   }
 
-  createOrder = async (userId, address) => {
+  createOrderByCart = async (userId, address) => {
     // 카트에 주문할 것이 있는지 확인
     const carts = await this.cartRepository.getCartsByUserId(userId);
     if (carts.length === 0) throw new NotFoundError('장바구니가 텅 비었어요.');
@@ -40,7 +40,7 @@ export class OrderService {
     }
 
     // 있으면 주문 생성
-    const order = await this.orderRepository.createOrder(
+    const order = await this.orderRepository.createOrderByCart(
       carts,
       userId,
       address
@@ -85,5 +85,30 @@ export class OrderService {
     );
 
     return updatedOrder;
+  };
+
+  createOrderByMenu = async (userId, menuId, quantity = 1, address) => {
+    const menu = await this.cartRepository.getMenuById(menuId);
+    const shippingFee = await this.orderRepository.getShippingFeeByStoreId(
+      menu.storeId
+    );
+    const totalPrice = menu.price * quantity + shippingFee;
+
+    const point = await this.orderRepository.getPointById(userId);
+    if (point < totalPrice) throw new ApiError('포인트가 부족합니다.');
+
+    // address를 입력하지 않았으면 User 테이블의 사용자 address로 배송
+    if (address == undefined || address == null) {
+      address = await this.orderRepository.getAddressByUserId(userId);
+      if (address == null) throw new BadRequestError('배송지를 입력해주세요.');
+    }
+
+    const order = await this.orderRepository.createOrderByMenu(
+      userId,
+      menu.storeId,
+      totalPrice,
+      address
+    );
+    return order;
   };
 }

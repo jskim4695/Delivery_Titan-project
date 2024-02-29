@@ -11,7 +11,7 @@ export class OrderRepository {
     return address;
   };
 
-  createOrder = async (carts, userId, address) => {
+  createOrderByCart = async (carts, userId, address) => {
     const order = await this.prisma.$transaction(async (tx) => {
       // 주문 생성
       const order = await tx.orders.create({
@@ -181,6 +181,50 @@ export class OrderRepository {
     const order = await this.prisma.orders.update({
       where: { id: +orderId },
       data: { status: status },
+    });
+    return order;
+  };
+
+  createOrderByMenu = async (userId, storeId, totalPrice, address) => {
+    const order = await this.prisma.$transaction(async (tx) => {
+      // 주문 생성
+      const order = await tx.orders.create({
+        data: {
+          storeId: +storeId,
+          totalPrice: +totalPrice,
+          userId: +userId,
+          address,
+        },
+      });
+      // Stores의 orderCount += 1
+      const store = await tx.stores.update({
+        where: { id: +storeId },
+        data: {
+          orderCount: {
+            increment: 1,
+          },
+        },
+      });
+      // 사용자 포인트 차감
+      await tx.users.update({
+        where: { id: +userId },
+        data: {
+          point: {
+            decrement: totalPrice,
+          },
+        },
+      });
+      // 사장님 포인트 추가
+      await tx.users.update({
+        where: { id: +store.ownerId },
+        data: {
+          point: {
+            increment: totalPrice,
+          },
+        },
+      });
+
+      return order;
     });
     return order;
   };
