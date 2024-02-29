@@ -99,4 +99,20 @@ export class ReviewRepository {
     });
     return getReview;
   };
+
+  getReviewByReviewId = async (reviewId) => {
+    const getReview = await this.prisma.reviews.findMany({
+      where: { id: +reviewId },
+      select: {
+        id: true,
+        userId: true,
+        contents: true,
+        stars: true,
+        reviewImage: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+    return getReview;
+  };
 }
