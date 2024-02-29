@@ -31,7 +31,7 @@ export class OrderRepository {
         },
       });
       // Stores의 orderCount += 1
-      await tx.stores.update({
+      const store = await tx.stores.update({
         where: { id: +carts[0].storeId },
         data: {
           orderCount: {
@@ -45,6 +45,15 @@ export class OrderRepository {
         data: {
           point: {
             decrement: carts.totalPrice,
+          },
+        },
+      });
+      // 사장님 포인트 추가
+      await tx.users.update({
+        where: { id: +store.ownerId },
+        data: {
+          point: {
+            increment: carts.totalPrice,
           },
         },
       });
