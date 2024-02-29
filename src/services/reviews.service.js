@@ -35,14 +35,14 @@ export class ReviewService {
 
   //리뷰 수정
   updateReview = async (reviewId, userId, contents, stars, reviewImage) => {
-    const review = await this.reviewRepository.getReview(reviewId);
+    const review = await this.reviewRepository.getReviewByReviewId(reviewId);
     if (!review) throw new NotFoundError('리뷰가 없습니다.');
     if (!stars || !contents || !stars)
       throw new BadRequestError('수정할 내용을 입력해주세요.');
     if (stars < 1 || stars > 5)
       throw new BadRequestError('평점은 1~5점을 입력해주세요.');
-    if (reviewImage != null || reviewImage != undefined) {
-      const imageName = store.reviewImage.split('com/')[1];
+    if (review.reviewImage != null || review.reviewImage != undefined) {
+      const imageName = review.reviewImage.split('com/')[1];
       const deleteCommand = new DeleteObjectCommand({
         Bucket: bucketName,
         Key: imageName,
@@ -68,15 +68,19 @@ export class ReviewService {
 
   //리뷰 삭제
   deleteReview = async (userId, reviewId) => {
-    const imageName = store.reviewImage.split('com/')[1];
-    const deleteCommand = new DeleteObjectCommand({
-      Bucket: bucketName,
-      Key: imageName,
-    });
-    try {
-      await s3.send(deleteCommand);
-    } catch (err) {
-      next(err);
+    const review = await this.reviewRepository.getReviewByReviewId(reviewId);
+    if (!review) throw new NotFoundError('리뷰가 없습니다.');
+    if (review.reviewImage != null || review.reviewImage != undefined) {
+      const imageName = review.reviewImage.split('com/')[1];
+      const deleteCommand = new DeleteObjectCommand({
+        Bucket: bucketName,
+        Key: imageName,
+      });
+      try {
+        await s3.send(deleteCommand);
+      } catch (err) {
+        next(err);
+      }
     }
 
     const deleteReview = await this.reviewRepository.deleteReview(
