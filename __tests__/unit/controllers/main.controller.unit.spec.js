@@ -5,6 +5,7 @@ const mainService = {
   searchMenu: jest.fn(),
   getAllStores: jest.fn(),
   sortStores: jest.fn(),
+  getStoreRanking: jest.fn(),
 };
 
 const req = {
@@ -135,5 +136,42 @@ describe('Main Controller Unit Test', () => {
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledTimes(1);
     expect(res.json).toHaveBeenCalledWith({ sortedStores: sampleSortedStores });
+  });
+
+  test('getStoreRanking 테스트 (정상)', async () => {
+    const sampleRanking = [
+      {
+        id: 1,
+        ownerId: 2,
+        storeName: 'bhc chicken',
+        category: 'CHICKEN',
+        storeImage: 'ppuringkle.jpg',
+        storeRate: 4.5,
+        orderCount: 3,
+        status: 'AVAILABLE',
+        sales: 79500,
+      },
+      {
+        id: 2,
+        ownerId: 4,
+        storeName: 'Sparkle Pizza',
+        category: 'PIZZA',
+        storeImage: 'sparkle.jpg',
+        storeRate: 4.4,
+        orderCount: 2,
+        status: 'AVAILABLE',
+        sales: 50000,
+      },
+    ];
+
+    mainService.getStoreRanking.mockResolvedValue(sampleRanking);
+
+    await mainController.getStoreRanking(req, res, next);
+
+    expect(mainService.getStoreRanking).toHaveBeenCalledTimes(1);
+    expect(res.status).toHaveBeenCalledTimes(1);
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledTimes(1);
+    expect(res.json).toHaveBeenCalledWith({ ranking: sampleRanking });
   });
 });

@@ -3,6 +3,7 @@ import { prisma } from '../utils/prisma/index.js';
 import { MainRepository } from '../repositories/main.repository.js';
 import { MainService } from '../services/main.service.js';
 import { MainController } from '../controllers/main.controller.js';
+import { authenticateUser } from '../middlewares/auth.middleware.js';
 
 const router = express.Router();
 
@@ -18,5 +19,12 @@ router.get('/main/store/sort', mainController.sortStores);
 
 /** 메인 페이지에서 업장 목록 조회 */
 router.get('/main/store', mainController.getAllStores);
+
+/** 메인 페이지에서 매출액 랭킹 보기 */
+router.get(
+  '/main/store/ranking',
+  authenticateUser,
+  mainController.getStoreRanking
+);
 
 export default router;

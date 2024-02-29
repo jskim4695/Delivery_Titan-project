@@ -62,4 +62,13 @@ export class MainRepository {
     });
     return sortedStores;
   };
+
+  getStoresNOrders = async () => {
+    const stores = await this.prisma.stores.findMany({
+      include: {
+        orders: true,
+      },
+    });
+    return stores;
+  };
 }

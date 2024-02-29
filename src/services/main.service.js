@@ -60,4 +60,29 @@ export class MainService {
     );
     return sortedStores;
   };
+
+  getStoreRanking = async () => {
+    const stores = await this.mainRepository.getStoresNOrders();
+    const ranking = [];
+    for (const store of stores) {
+      const sales = store.orders.reduce(
+        (acc, curr) => acc + curr.totalPrice,
+        0
+      );
+      const storeInfo = {
+        id: store.id,
+        ownerId: store.ownerId,
+        storeName: store.storeName,
+        category: store.category,
+        storeImage: store.storeImage,
+        storeRate: store.storeRate,
+        orderCount: store.orderCount,
+        status: store.status,
+        sales,
+      };
+      ranking.push(storeInfo);
+    }
+    ranking.sort((a, b) => b.sales - a.sales);
+    return ranking;
+  };
 }
