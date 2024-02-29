@@ -2,10 +2,11 @@ import { expect, jest } from '@jest/globals';
 import { OrderController } from '../../../src/controllers/orders.controller';
 
 let orderService = {
-  createOrder: jest.fn(),
+  createOrderByCart: jest.fn(),
   getOrdersByOwnerId: jest.fn(),
   getOrdersByUserId: jest.fn(),
   updateStatus: jest.fn(),
+  createOrderByMenu: jest.fn(),
 };
 
 const req = {
@@ -27,7 +28,7 @@ describe('Order Controller Unit Test', () => {
     res.status.mockReturnValue(res);
   });
 
-  test('createOrder 테스트 (정상)', async () => {
+  test('createOrderByCart 테스트 (정상)', async () => {
     req.userId = 1;
     req.role = 'CUSTOMER';
     req.body = { address: 'Seoul' };
@@ -43,12 +44,12 @@ describe('Order Controller Unit Test', () => {
       updatedAt: '2024-02-25T06:38:42.129Z',
     };
 
-    orderService.createOrder.mockResolvedValue(sampleOrder);
+    orderService.createOrderByCart.mockResolvedValue(sampleOrder);
 
-    await orderController.createOrder(req, res, next);
+    await orderController.createOrderByCart(req, res, next);
 
-    expect(orderService.createOrder).toHaveBeenCalledTimes(1);
-    expect(orderService.createOrder).toHaveBeenCalledWith(
+    expect(orderService.createOrderByCart).toHaveBeenCalledTimes(1);
+    expect(orderService.createOrderByCart).toHaveBeenCalledWith(
       req.userId,
       req.body.address
     );
@@ -159,6 +160,40 @@ describe('Order Controller Unit Test', () => {
     );
     expect(res.status).toHaveBeenCalledTimes(1);
     expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledTimes(1);
+    expect(res.json).toHaveBeenCalledWith({ order: sampleOrder });
+  });
+
+  test('createOrderByMenu 테스트 (정상)', async () => {
+    req.params = { menuId: 1 };
+    req.userId = 1;
+    req.role = 'CUSTOMER';
+    req.body = { quantity: 1, address: 'Seoul' };
+
+    const sampleOrder = {
+      id: 1,
+      storeId: 1,
+      userId: 1,
+      address: 'Seoul',
+      totalPrice: 34000,
+      status: 'ORDER_COMPLETE',
+      createdAt: '2024-02-25T06:38:42.129Z',
+      updatedAt: '2024-02-25T06:38:42.129Z',
+    };
+
+    orderService.createOrderByMenu.mockResolvedValue(sampleOrder);
+
+    await orderController.createOrderByMenu(req, res, next);
+
+    expect(orderService.createOrderByMenu).toHaveBeenCalledTimes(1);
+    expect(orderService.createOrderByMenu).toHaveBeenCalledWith(
+      req.userId,
+      req.params.menuId,
+      req.body.quantity,
+      req.body.address
+    );
+    expect(res.status).toHaveBeenCalledTimes(1);
+    expect(res.status).toHaveBeenCalledWith(201);
     expect(res.json).toHaveBeenCalledTimes(1);
     expect(res.json).toHaveBeenCalledWith({ order: sampleOrder });
   });

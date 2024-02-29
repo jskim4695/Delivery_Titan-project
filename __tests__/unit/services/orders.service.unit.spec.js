@@ -8,7 +8,7 @@ import {
 
 let orderRepository = {
   getAddressByUserId: jest.fn(),
-  createOrder: jest.fn(),
+  createOrderByCart: jest.fn(),
   getPointById: jest.fn(),
   getStoreIdByOwnerId: jest.fn(),
   getShippingFeeByStoreId: jest.fn(),
@@ -16,6 +16,7 @@ let orderRepository = {
   getOrdersByUserId: jest.fn(),
   getOrderById: jest.fn(),
   updateStatus: jest.fn(),
+  createOrderByMenu: jest.fn(),
 };
 
 let cartRepository = {
@@ -34,7 +35,7 @@ describe('Order Service Unit Test', () => {
     id: 1,
     storeId: 1,
     userId: 1,
-    address: 'Seoul Seongworgokdong 21',
+    address: 'Seoul Haworgokdong 21',
     totalPrice: 34000,
     status: 'ORDER_COMPLETE',
     createdAt: '2024-02-25T06:38:42.129Z',
@@ -97,50 +98,50 @@ describe('Order Service Unit Test', () => {
     menuImage: 'menu1.jpg',
   };
 
-  test('createOrder 테스트 (정상)', async () => {
+  test('createOrderByCart 테스트 (정상)', async () => {
     const userId = 1;
-    const address = 'Seoul hawergokdong 21';
+    const address = 'Seoul Haworgokdong 21';
 
     cartRepository.getCartsByUserId.mockResolvedValue(sampleCarts);
     cartRepository.getMenuById.mockResolvedValue(sampleMenu);
     orderRepository.getShippingFeeByStoreId.mockResolvedValue(3000);
     orderRepository.getPointById.mockResolvedValue(1000000);
     orderRepository.getAddressByUserId.mockResolvedValue(
-      'Seoul hawergokdong 21'
+      'Seoul Haworgokdong 21'
     );
-    orderRepository.createOrder.mockResolvedValue(sampleOrder);
+    orderRepository.createOrderByCart.mockResolvedValue(sampleOrder);
 
-    const result = await orderService.createOrder(userId, address);
+    const result = await orderService.createOrderByCart(userId, address);
 
     expect(result).toEqual(sampleOrder);
   });
 
-  test('createOrder 테스트 by NotFoundError', async () => {
+  test('createOrderByCart 테스트 by NotFoundError', async () => {
     const userId = 1;
-    const address = 'Seoul hawergokdong 21';
+    const address = 'Seoul Haworgokdong 21';
 
     cartRepository.getCartsByUserId.mockResolvedValue([]);
 
-    await expect(orderService.createOrder(userId, address)).rejects.toThrow(
-      new NotFoundError('장바구니가 텅 비었어요.')
-    );
+    await expect(
+      orderService.createOrderByCart(userId, address)
+    ).rejects.toThrow(new NotFoundError('장바구니가 텅 비었어요.'));
   });
 
-  test('createOrder 테스트 by ApiError', async () => {
+  test('createOrderByCart 테스트 by ApiError', async () => {
     const userId = 1;
-    const address = 'Seoul hawergokdong 21';
+    const address = 'Seoul Haworgokdong 21';
 
     cartRepository.getCartsByUserId.mockResolvedValue(sampleCarts);
     cartRepository.getMenuById.mockResolvedValue(sampleMenu);
     orderRepository.getShippingFeeByStoreId.mockResolvedValue(3000);
     orderRepository.getPointById.mockResolvedValue(0);
 
-    await expect(orderService.createOrder(userId, address)).rejects.toThrow(
-      new ApiError('포인트가 부족합니다.')
-    );
+    await expect(
+      orderService.createOrderByCart(userId, address)
+    ).rejects.toThrow(new ApiError('포인트가 부족합니다.'));
   });
 
-  test('createOrder 테스트 by BadRequestError', async () => {
+  test('createOrderByCart 테스트 by BadRequestError', async () => {
     const userId = 1;
     const address = null;
 
@@ -150,9 +151,9 @@ describe('Order Service Unit Test', () => {
     orderRepository.getPointById.mockResolvedValue(1000000);
     orderRepository.getAddressByUserId.mockResolvedValue(null);
 
-    await expect(orderService.createOrder(userId, address)).rejects.toThrow(
-      new BadRequestError('배송지를 입력해주세요.')
-    );
+    await expect(
+      orderService.createOrderByCart(userId, address)
+    ).rejects.toThrow(new BadRequestError('배송지를 입력해주세요.'));
   });
 
   test('getOrdersByOwnerId 테스트 (정상)', async () => {
@@ -197,7 +198,7 @@ describe('Order Service Unit Test', () => {
     id: 1,
     storeId: 1,
     userId: 1,
-    address: 'Seoul Seongworgokdong 21',
+    address: 'Seoul Haworgokdong 21',
     totalPrice: 34000,
     status: 'DELIVERY_COMPLETE',
     createdAt: '2024-02-25T06:38:42.129Z',
@@ -236,5 +237,61 @@ describe('Order Service Unit Test', () => {
     await expect(orderService.updateStatus(orderId, status)).rejects.toThrow(
       new BadRequestError('잘못된 상태입니다.')
     );
+  });
+
+  test('createOrderByMenu 테스트 (정상)', async () => {
+    const userId = 1;
+    const menuId = 1;
+    const quantity = 1;
+    const address = 'Seoul Haworgokdong 21';
+
+    cartRepository.getCartsByUserId.mockResolvedValue(sampleCarts);
+    cartRepository.getMenuById.mockResolvedValue(sampleMenu);
+    orderRepository.getShippingFeeByStoreId.mockResolvedValue(3000);
+    orderRepository.getPointById.mockResolvedValue(1000000);
+    orderRepository.getAddressByUserId.mockResolvedValue(
+      'Seoul Haworgokdong 21'
+    );
+    orderRepository.createOrderByMenu.mockResolvedValue(sampleOrder);
+
+    const result = await orderService.createOrderByMenu(
+      userId,
+      menuId,
+      quantity,
+      address
+    );
+
+    expect(result).toEqual(sampleOrder);
+  });
+
+  test('createOrderByMenu 테스트 by ApiError', async () => {
+    const userId = 1;
+    const menuId = 1;
+    const quantity = 1;
+    const address = 'Seoul Haworgokdong 21';
+
+    cartRepository.getCartsByUserId.mockResolvedValue(sampleCarts);
+    cartRepository.getMenuById.mockResolvedValue(sampleMenu);
+    orderRepository.getShippingFeeByStoreId.mockResolvedValue(3000);
+    orderRepository.getPointById.mockResolvedValue(0);
+
+    await expect(
+      orderService.createOrderByMenu(userId, menuId, quantity, address)
+    ).rejects.toThrow(new ApiError('포인트가 부족합니다.'));
+  });
+
+  test('createOrderByMenu 테스트 by BadRequestError', async () => {
+    const userId = 1;
+    const address = null;
+
+    cartRepository.getCartsByUserId.mockResolvedValue(sampleCarts);
+    cartRepository.getMenuById.mockResolvedValue(sampleMenu);
+    orderRepository.getShippingFeeByStoreId.mockResolvedValue(3000);
+    orderRepository.getPointById.mockResolvedValue(1000000);
+    orderRepository.getAddressByUserId.mockResolvedValue(null);
+
+    await expect(
+      orderService.createOrderByMenu(userId, address)
+    ).rejects.toThrow(new BadRequestError('배송지를 입력해주세요.'));
   });
 });

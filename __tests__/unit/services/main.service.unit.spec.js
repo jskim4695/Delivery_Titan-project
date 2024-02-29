@@ -94,7 +94,7 @@ describe('Main Service Unit Test', () => {
         id: 4,
       },
     ];
-
+    console.log('어리너링너ㅣ린어');
     mainRepository.getAllStores.mockResolvedValue(sampleStores);
 
     const result = await mainService.getAllStores();
