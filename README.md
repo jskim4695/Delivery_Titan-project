@@ -1,4 +1,5 @@
-<img src="https://nbcamp2024.slack.com/files/U06B3P2P533/F06PADBTVGW/group_1-1.png"/>
+![Titan](https://github.com/Node-4th/Backoffice-12.Titan/assets/140699909/110e3dfd-cfb2-42a7-8825-11547a9b7719)
+
 
 ## 🛵딜리버리 타이탄🛵(Delivery Titan)
 
