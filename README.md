@@ -1,3 +1,5 @@
+<img src="https://nbcamp2024.slack.com/files/U06B3P2P533/F06PADBTVGW/group_1-1.png"/>
+
 ## 🛵딜리버리 타이탄🛵(Delivery Titan)
 
 ### ✨ 프로젝트 소개
