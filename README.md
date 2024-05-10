@@ -52,6 +52,7 @@
  - https://www.notion.so/teamsparta/4b2aaadab8bb473a913e14b9b2729f12?v=3a5d055d281d4d28a4b13a9c27a71ac2
 
 
- ### 🔧 ERD URL
-- https://drawsql.app/teams/-901/diagrams/-3
+ ### 🔧 ERD 
+![drawSQL-image-export-2024-05-10 (1)](https://github.com/Node-4th/Backoffice-12.Titan/assets/154856948/97dd61b7-535d-421f-a2aa-0078235118f7)
+
 
